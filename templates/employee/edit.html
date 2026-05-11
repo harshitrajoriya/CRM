@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+.page-header {
+    margin-bottom: 20px;
+}
+
+.page-header h2 {
+    margin-bottom: 5px;
+}
+
+/* CARD */
+.card {
+    background: #13161d;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #222;
+    margin-bottom: 20px;
+    max-width: 800px;
+}
+
+/* FORM GRID */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.form-grid input,
+.form-grid textarea {
+    padding: 10px;
+    background: #1a1e28;
+    border: 1px solid #2a2f3a;
+    border-radius: 6px;
+    color: white;
+    width: 100%;
+}
+
+.form-grid textarea {
+    grid-column: span 2;
+}
+
+/* BUTTON */
+.btn {
+    background: #4f7cff;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    grid-column: span 2;
+    width: 100%;
+    max-width: 250px;
+    /* margin: auto; */
+    display: flex;
+    justify-content: center;
+    padding: 15px;
+
+}
+
+/* BACK LINK */
+.back {
+    margin-bottom: 15px;
+    display: inline-block;
+    color: #aaa;
+    text-decoration: none;
+}
+
+.back:hover {
+    color: white;
+}
+</style>
+
+<div class="container">
+
+    <!-- BACK -->
+    <a href="/add-company/" class="back">← Back to Employees</a>
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <h2>Edit Employee</h2>
+        <small style="color:#888;">Update Employee details</small>
+    </div>
+
+    <!-- FORM -->
+    <div class="card">
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-grid">
+
+                <input type="text" name="Employee_name" 
+                    value="{{ employee.employee_name }}"
+                    required>
+
+                <input type="email" name="email" 
+                    value="{{ employee.user.email }}"
+                    required>
+
+                <input type="text" name="phone" 
+                    value="{{ employee.user.users_set.first.phone }}"
+                    >
+
+                <input type="password" name="password"
+                    placeholder="New Password (optional)">
+
+                <textarea name="address"
+                    >{{ employee.address }}</textarea>
+                
+                <input type="text" name="dob" value="{{employee.dob}}">
+                <input type="text" name="doj" value="{{employee.doj}}">
+                <input type="text" name="salary" value="{{employee.salary}}">
+                <button class="btn">Update Employee</button>
+
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+/* PAGE */
+.container {
+    width: 100%;
+}
+
+/* HEADER */
+.page-header {
+    margin-bottom: 20px;
+}
+
+.page-header h2 {
+    margin-bottom: 10px;
+}
+
+/* SEARCH */
+.search-box input {
+    padding: 8px 12px;
+    width: 250px;
+    background: #1a1e28;
+    border: 1px solid #2a2f3a;
+    border-radius: 6px;
+    color: white;
+}
+
+/* CARD */
+.card {
+    background: #13161d;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #222;
+    margin-bottom: 20px;
+}
+
+/* FORM GRID */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.form-grid input,
+.form-grid textarea {
+    padding: 10px;
+    background: #1a1e28;
+    border: 1px solid #2a2f3a;
+    border-radius: 6px;
+    color: white;
+    width: 100%;
+}
+
+.form-grid textarea {
+    grid-column: span 2;
+}
+
+/* BUTTON */
+.btn {
+    grid-column: span 1;
+    background: #4f7cff;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+}
+
+/* TABLE */
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    text-align: left;
+    padding: 12px;
+    color: #888;
+    font-size: 13px;
+}
+
+td {
+    padding: 14px 12px;
+    border-top: 1px solid #222;
+}
+
+tr:hover {
+    background: rgba(255,255,255,0.03);
+}
+
+/* ACTION */
+.action a {
+    margin-right: 10px;
+    font-size: 13px;
+}
+
+.action a:first-child {
+    color: #4f7cff;
+}
+
+.action a:last-child {
+    color: #ff4d4d;
+}
+
+/* PAGINATION */
+.pagination {
+    margin-top: 15px;
+}
+
+.pagination a {
+    margin: 5px;
+    padding: 6px 12px;
+    background: #1a1e28;
+    border-radius: 6px;
+    color: white;
+}
+</style>
+
+<div class="container">
+
+<!-- HEADER -->
+<div class="page-header">
+    <a href="/dashboard/">← Home</a>
+    
+</div>
+<div class="page-header">
+    <h2>Employee Management</h2>
+</div>
+<!-- SEARCH -->
+<div class="search-box">
+    <form method="GET">
+        <input type="text" name="search" placeholder="Search Employee...">
+    </form>
+</div>
+<br>
+{% if messages %}
+{%for message in messages%}
+{{message}}
+{%endfor%}
+{%endif%}
+{% if role == "company" %}
+<a href="/add-employee/">
+<button class="btn">Add Employee</button>
+</a>
+{%endif%}
+<br>
+<!-- TABLE -->
+<div class="card">
+<div class="table-wrap">
+
+<table>
+<thead>
+<tr>
+    <th>Employee Email</th>
+    <th>Employee ID</th>
+    <th>Company name</th>
+    <th>Employee Name</th>
+    <th>Phone No.</th>
+    <th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+{% for e in employees %}
+<tr>
+    <td>{{ e.user.email }}</td>
+    <td>{{ e.user.userinfo.userid }}</td>
+    <td>{{ e.company.company_name }}</td>
+    <td>{{ e.employee_name }}</td>
+    <td>{{ e.user.users_set.first.phone }}</td>
+    <td class="action">
+        <a href="/edit-employee/{{e.id}}">Edit</a>
+        <a href="/delete-employee/{{e.id}}">Delete</a>
+    </td>
+</tr>
+{% endfor %}
+</tbody>
+
+</table>
+
+</div>
+
+<!-- PAGINATION -->
+<div class="pagination">
+{% if employees.has_previous %}
+<a href="?page={{ employees.previous_page_number }}">Prev</a>
+{% endif %}
+
+<span>{{ employees.number }}</span>
+
+{% if employees.has_next %}
+<a href="?page={{ employees.next_page_number }}">Next</a>
+{% endif %}
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

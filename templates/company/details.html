@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+/* HEADER */
+.page-header {
+    margin-bottom: 20px;
+}
+
+.page-header h2 {
+    margin-bottom: 10px;
+}
+
+/* SEARCH */
+.search-box input {
+    padding: 8px 12px;
+    width: 250px;
+    background: #1a1e28;
+    border: 1px solid #2a2f3a;
+    border-radius: 6px;
+    color: white;
+}
+
+/* CARD */
+.card {
+    background: #13161d;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #222;
+    margin-bottom: 20px;
+}
+
+/* FORM GRID */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.form-grid input,
+.form-grid textarea {
+    padding: 10px;
+    background: #1a1e28;
+    border: 1px solid #2a2f3a;
+    border-radius: 6px;
+    color: white;
+    width: 100%;
+}
+
+.form-grid textarea {
+    grid-column: span 2;
+}
+
+/* BUTTON */
+.btn {
+    background: #4f7cff;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+}
+
+/* TABLE */
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    text-align: left;
+    padding: 12px;
+    color: #888;
+    font-size: 13px;
+}
+
+td {
+    padding: 14px 12px;
+    border-top: 1px solid #222;
+}
+
+tr:hover {
+    background: rgba(255,255,255,0.03);
+}
+
+/* ACTION */
+.action a {
+    margin-right: 10px;
+    font-size: 13px;
+}
+
+.action a:first-child {
+    color: #4f7cff;
+}
+
+.action a:last-child {
+    color: #ff4d4d;
+}
+
+/* PAGINATION */
+.pagination {
+    margin-top: 15px;
+}
+
+.pagination a {
+    margin: 5px;
+    padding: 6px 12px;
+    background: #1a1e28;
+    border-radius: 6px;
+    color: white;
+}
+</style>
+
+<div class="container">
+
+<!-- HEADER -->
+<div class="page-header">
+    <a href="/dashboard/">← Home</a>
+</div>
+<div class="page-header">
+    <h2>Company Management</h2>
+</div>
+
+<!-- SEARCH -->
+<div class="search-box">
+    <form method="GET">
+        <input type="text" name="search" placeholder="Search company...">
+    </form>
+</div>
+<br>
+{% if messages %}
+{%for message in messages%}
+{{message}}
+{%endfor%}
+{%endif%}
+{% if role == "admin" %}
+<a href="/add-company/">
+<button class="btn">Add Company</button>
+</a>
+{%endif%}
+<br>
+<!-- TABLE -->
+<div class="card">
+<div class="table-wrap">
+
+<table>
+<thead>
+<tr>
+    <th>Company Name</th>
+    <th>Company Email</th>
+    <th>GST No.</th>
+    <th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+{% for c in companies %}
+<tr>
+    <td>{{ c.company_name }}</td>
+    <td>{{ c.user.email }}</td>
+    <td>{{ c.gst }}</td>
+
+    <td class="action">
+        <a href="/edit-company/{{c.id}}">Edit</a>
+        <a href="/delete-company/{{c.id}}">Delete</a>
+    </td>
+</tr>
+{% endfor %}
+</tbody>
+
+</table>
+
+</div>
+
+<!-- PAGINATION -->
+<div class="pagination">
+{% if companies.has_previous %}
+<a href="?page={{ companies.previous_page_number }}">Prev</a>
+{% endif %}
+
+<span>{{ companies.number }}</span>
+
+{% if companies.has_next %}
+<a href="?page={{ companies.next_page_number }}">Next</a>
+{% endif %}
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}
