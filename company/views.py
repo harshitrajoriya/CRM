@@ -1,7 +1,8 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.models import User
-from accounts.models import Users, EmployeeInfo, UserInfo
+from accounts.models import Users, EmployeeInfo, UserInfo, Project
 from django.contrib import messages
+from django.db.models import Q
 # Create your views here.
 def add_employee(request):
     company=UserInfo.objects.get(user=request.user)
@@ -103,8 +104,95 @@ def employee_details(request):
     else:
         employees = EmployeeInfo.objects.none()
         
+    search = request.GET.get("search")
+    if search:
+        employees=employees.filter(
+            Q(employee_name__icontains=search) |
+            Q(user__email__icontains=search) |
+            Q(user__userinfo__userid__icontains=search)
+        )
     context={
     'employees':employees,
     'role':role,
-}
+    'employees': employees,
+    }
     return render(request,'employee/details.html',context)
+
+def project(request):
+    role=Users.objects.get(user=request.user).role
+    projects=Project.objects.all()
+    context = {
+        'role':role,
+        'projects':projects,
+    }
+    return render(request,"project/project.html",context)
+
+def add_project(request):
+    role = Users.objects.get(user=request.user).role
+    employees=EmployeeInfo.objects.all()
+    company = UserInfo.objects.filter(user = request.user).first()
+    if request.method == "POST":
+        project_name        = request.POST.get("project_name")
+        client_name         = request.POST.get("client_name")
+        start_date          = request.POST.get("start_date") or None
+        end_date            = request.POST.get("end_date") or None
+        priority            = request.POST.get("priority")
+        status              = request.POST.get("status")
+        project_description = request.POST.get("project_description")
+        assign_to           = EmployeeInfo.objects.filter(id=request.POST.get("assign_to")).first()
+        
+        Project.objects.create(
+            company             = company,
+            project_name        = project_name,
+            client_name         = client_name,
+            start_date          = start_date,
+            end_date            = end_date,
+            assign_to           = assign_to,
+            priority            = priority,
+            status              = status,
+            project_description = project_description,
+        )
+        messages.success(request,"Project Added Successfully")
+        return redirect('add_project')
+    context = {
+        'employees':employees,
+        'role':role,
+    }
+    return render(request,"project/add_project.html",context)
+
+def delete_project(request,project_id):
+    Project.objects.get(project_id = project_id).delete()
+    messages.success(request,"project deleted")
+    return redirect('project')
+
+def edit_project(request,project_id):
+    role = Users.objects.get(user=request.user).role
+    project=Project.objects.filter(project_id=project_id).first()
+    employees = EmployeeInfo.objects.all()
+    if request.method == "POST":
+        project.project_name = request.POST.get("project_name")
+        project.client_name = request.POST.get("client_name")
+        project.start_date = request.POST.get("start_date") or None
+        project.end_date = request.POST.get("end_date") or None
+        project.assign_to = EmployeeInfo.objects.get(id=request.POST.get("assign_to"))
+        project.priority = request.POST.get("priority")
+        project.status = request.POST.get("status")
+        project.project_description = request.POST.get("project_description")
+        project.save()
+        messages.success(request,"Project Updated Successfully")
+        return redirect('edit_project',project_id=project.project_id)
+    context = {
+        'project':project,
+        'employees':employees,
+        'role':role,
+    }
+    return render(request,"project/edit_project.html",context)
+
+def project_details(request,project_id):
+    role = Users.objects.get(user=request.user).role
+    project = Project.objects.filter(project_id=project_id).first()
+    context={
+        'role' : role,
+        'project': project,
+    }
+    return render(request,"project/project_details.html",context)

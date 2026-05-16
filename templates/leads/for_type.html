@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+.container{
+    width:100%;
+}
+
+.card{
+    background:#13161d;
+    padding:20px;
+    border-radius:12px;
+    border:1px solid #222;
+    margin-bottom:20px;
+}
+
+.form-flex{
+    display:flex;
+    gap:12px;
+    margin-bottom:20px;
+}
+
+.form-flex input,
+.form-flex select{
+    flex:1;
+    padding:12px;
+    background:#1a1e28;
+    border:1px solid #2a2f3a;
+    border-radius:8px;
+    color:white;
+}
+
+.btn{
+    background:#4f7cff;
+    border:none;
+    padding:12px 18px;
+    border-radius:8px;
+    color:white;
+    cursor:pointer;
+}
+
+.table-wrap{
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    text-align:left;
+    padding:12px;
+    color:#888;
+}
+
+td{
+    padding:14px 12px;
+    border-top:1px solid #222;
+}
+
+.status{
+    padding:6px 10px;
+    border-radius:20px;
+    font-size:12px;
+}
+
+.active{
+    background:rgba(40,199,111,.15);
+    color:#28c76f;
+}
+
+.inactive{
+    background:rgba(234,84,85,.15);
+    color:#ea5455;
+}
+
+.delete-btn{
+    color:#ea5455;
+    text-decoration:none;
+}
+
+</style>
+
+<div class="container">
+    <a href="/add-for-type/">
+<button class="btn">Add Lead Type</button>
+</a>
+<br>
+
+    <div class="card">
+        {% if messages %}
+
+    {% for message in messages %}
+
+        {% if "Lead Type added" in message|stringformat:"s" %}
+
+            <script>
+
+                Swal.fire({
+
+                    title: 'Success',
+
+                    text: 'Lead Type Added Successfully',
+
+                    icon: 'success',
+
+                    background: '#13161d',
+
+                    color: 'white',
+
+                    confirmButtonColor: '#4f7cff',
+
+                    showDenyButton: true,
+
+                    confirmButtonText: 'Add More',
+
+                    denyButtonText: 'Go Back'
+
+                }).then((result) => {
+
+                    if(result.isConfirmed){
+
+                        window.location.href = "/add-for-type/";
+                    }
+
+                    else if(result.isDenied){
+
+                        window.location.href = "/for-type/";
+                    }
+
+                });
+
+            </script>
+
+        {% elif "Lead type deleted" in message|stringformat:"s" %}
+
+            <script>
+
+                Swal.fire({
+
+                    title: 'Deleted',
+
+                    text: 'Lead Type Deleted Successfully',
+
+                    icon: 'success',
+
+                    background: '#13161d',
+
+                    color: 'white',
+
+                    confirmButtonColor: '#ea5455'
+
+                });
+
+            </script>
+
+        {% endif %}
+
+    {% endfor %}
+
+{% endif %}
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>ID</th>
+                        <th>Type Name</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for t in types %}
+
+                    <tr>
+
+                        <td>{{ forloop.counter }}</td>
+
+                        <td>
+                            {{ t.for_type_name }}
+                        </td>
+
+                        <td>
+
+{% if t.for_type_status == "active" %}
+
+    <button
+        class="status status-active"
+        onclick="changeTypeStatus(event, '/inactive-lead-type/{{ t.id }}/', 'inactive')"
+    >
+        ● Active
+    </button>
+
+{% else %}
+
+    <button
+        class="status status-inactive"
+        onclick="changeTypeStatus(event, '/active-lead-type/{{ t.id }}/', 'active')"
+    >
+        ● Inactive
+    </button>
+
+{% endif %}
+
+</td>
+
+                        <td>
+
+                            <a
+                                href="/delete-lead-type/{{ t.id }}"
+                                class="delete-btn"
+                                onclick="deleteType(event, this.href)"
+                            >
+                                Delete
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+
+function changeTypeStatus(event, url, status){
+
+    event.preventDefault();
+
+    Swal.fire({
+
+        title: `Do you want to ${status} this type?`,
+
+        icon: 'warning',
+
+        background: '#13161d',
+
+        color: 'white',
+
+        showCancelButton: true,
+
+        confirmButtonColor: '#4f7cff',
+
+        cancelButtonColor: '#ea5455',
+
+        confirmButtonText: 'Yes',
+
+    }).then((result) => {
+
+        if(result.isConfirmed){
+
+            window.location.href = url;
+        }
+
+    });
+}
+
+</script>
+<script>
+
+function deleteType(event, url){
+
+    event.preventDefault();
+
+    Swal.fire({
+
+        title: 'Delete Type?',
+
+        text: "This action cannot be undone.",
+
+        icon: 'warning',
+
+        background: '#13161d',
+
+        color: 'white',
+
+        showCancelButton: true,
+
+        confirmButtonColor: '#ea5455',
+
+        cancelButtonColor: '#4f7cff',
+
+        confirmButtonText: 'Yes, Delete',
+
+        cancelButtonText: 'Cancel'
+
+    }).then((result) => {
+
+        if(result.isConfirmed){
+
+            window.location.href = url;
+        }
+
+    });
+}
+
+</script>
+{% endblock %}

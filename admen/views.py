@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
-from accounts.models import UserInfo, Users
+from accounts.models import UserInfo, Users, EmployeeInfo, Leads, Leadsource, ForType
 from django.contrib import messages
+from django.db.models import Q
 # Create your views here.
 def add_company(request):
     if request.method=="POST":
@@ -74,8 +75,167 @@ def edit_company(request,id):
 def company_details(request):
     companies = UserInfo.objects.filter(user__users__role="company")
     role = Users.objects.get(user=request.user).role
+    
+    search = request.GET.get("search")
+    if search:
+        companies=companies.filter(
+            Q(company_name__icontains = search) |
+            Q(user__email__icontains = search) |
+            Q(gst__icontains = search)
+        )
     context={
         'companies':companies,
         'role':role,
     }
     return render(request,'company/details.html',context)
+
+def leads(request):
+    role = Users.objects.get(user=request.user).role
+    employees = EmployeeInfo.objects.all()
+
+    leads = Leads.objects.all()
+    search = request.GET.get("search")
+    if search:
+        leads = leads.filter(
+            Q(lead_name__icontains = search) |
+            Q(lead_email__icontains = search)
+        )
+    context={
+        'role':role,
+        'employees':employees,
+        'leads':leads,
+    }
+    return render(request,"leads/leads.html",context)
+
+def add_leads(request):
+    company = UserInfo.objects.filter(user=request.user).first()
+    role = Users.objects.get(user=request.user).role
+    employees = EmployeeInfo.objects.all()
+    types = ForType.objects.all()
+    sources = Leadsource.objects.all()
+    
+    if request.method == "POST":
+        company_name     = request.POST.get("company_name")
+        lead_name        = request.POST.get("lead_name")
+        lead_phone       = request.POST.get("lead_phone")
+        lead_email       = request.POST.get("lead_email")
+        
+        lead_source      = Leadsource.objects.get(id=request.POST.get("lead_source"))
+        for_type         = ForType.objects.get(id=request.POST.get("for_type"))
+        
+        from_assign_user = EmployeeInfo.objects.filter(id= request.POST.get("from_assign_user")).first()
+        to_assign_user   = EmployeeInfo.objects.filter(id= request.POST.get("to_assign_user")).first()
+        
+        Leads.objects.create(
+            company = company,
+            company_name = company_name,
+            lead_name = lead_name,
+            lead_phone = lead_phone,
+            lead_email = lead_email,
+            from_assign_user = from_assign_user,
+            to_assign_user = to_assign_user,
+            lead_source = lead_source,
+            for_type = for_type,
+            status = "new",
+        )
+        messages.success(request,"Lead added successfully")
+        return redirect('leads')
+    context = {
+        'employees': employees,
+        'role': role,
+        'types':types,
+        'sources':sources,
+    }
+    return render(request,"leads/add_leads.html",context)
+
+def delete_lead(request,id):
+    Leads.objects.get(id=id).delete()
+    messages.success(request,"Lead deleted successfully")
+    return redirect('leads')
+
+def lead_source(request):
+    role = Users.objects.get(user=request.user).role
+    sources=Leadsource.objects.all()
+    context={
+        'role':role,
+        'sources':sources,
+    }
+    return render(request,"leads/lead_source.html",context)
+
+def add_lead_source(request):
+    role=Users.objects.get(user=request.user).role
+    if request.method == "POST":
+        lead_source_name = request.POST.get("lead_source_name")
+        lead_status = request.POST.get("lead_status")
+        Leadsource.objects.create(
+            lead_source_name=lead_source_name,
+            lead_status=lead_status
+        )
+        messages.success(request,"Source Added Successfully")
+        return redirect('lead_source')
+    context ={
+        'role':role,
+    }
+    return render(request,"leads/add_lead_source.html",context)
+
+def delete_lead_source(request,id):
+    Leadsource.objects.get(id=id).delete()
+    messages.success(request,"Source deleted successfully")
+    return redirect('lead_source')
+
+def inactive_lead_source(request, id):
+    source = Leadsource.objects.get(id=id)
+    source.lead_status = "inactive"
+    source.save()
+    return redirect('lead_source')
+
+
+def active_lead_source(request, id):
+    source = Leadsource.objects.get(id=id)
+    source.lead_status = "active"
+    source.save()
+    return redirect('lead_source')
+
+def for_type(request):
+    role = Users.objects.get(user=request.user).role
+    types=ForType.objects.all()
+    context={
+        'role':role,
+        'types':types,
+    }
+    return render(request,"leads/for_type.html",context)
+
+def add_for_type(request):
+    role=Users.objects.get(user=request.user).role
+    if request.method == "POST":
+        for_type_name   = request.POST.get("for_type_name")
+        for_type_status = request.POST.get("for_type_status")
+        ForType.objects.create(
+            for_type_name = for_type_name,
+            for_type_status = for_type_status,
+        )
+        messages.success(request,"Lead Type added")
+        return redirect('for_type')
+    context={
+        'role':role
+    }
+    return render(request,'leads/add_for_type.html',context)
+
+def delete_lead_type(request,id):
+    ForType.objects.get(id=id).delete()
+    messages.success(request,"Lead type deleted")
+    return redirect('for_type')
+
+def inactive_lead_type(request,id):
+    type=ForType.objects.get(id=id)
+    type.for_type_status = 'inactive'
+    type.save()
+    messages.success(request,"Lead type inactivated")
+    return redirect('for_type')
+
+def active_lead_type(request,id):
+    type=ForType.objects.get(id=id)
+    type.for_type_status = 'active'
+    type.save()
+    messages.success(request,"Lead type activated")
+    return redirect('for_type')

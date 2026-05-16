@@ -402,7 +402,187 @@
 a:hover {
     color: #4f7cff;
 }
+/* LEADS DROPDOWN */
+
+.nav-parent{
+    width:100%;
+}
+
+/* MAIN BUTTON */
+
+.lead-toggle{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    cursor:pointer;
+}
+
+/* LEFT SIDE */
+
+.lead-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+/* DROPDOWN */
+
+.nav-dropdown{
+    display:none;
+    margin-top:6px;
+    padding-left:18px;
+}
+
+/* OPEN */
+
+.nav-open .nav-dropdown{
+    display:block;
+}
+
+/* LINKS */
+
+.nav-dropdown a{
+    display:flex;
+    align-items:center;
+    height:38px;
+    padding:0 14px;
+    margin-top:4px;
+    border-radius:10px;
+    color:#9aa4b2;
+    font-size:13px;
+    text-decoration:none;
+    transition:.2s;
+}
+
+/* HOVER */
+
+.nav-dropdown a:hover{
+    background:#1a1e28;
+    color:white;
+}
+
+/* ACTIVE CHILD */
+
+.dropdown-active{
+    background:rgba(79,124,255,.12);
+    color:#4f7cff !important;
+}
+
+/* ARROW */
+
+.dropdown-arrow{
+    transition:.25s;
+}
+
+/* ROTATE */
+
+.nav-open .dropdown-arrow{
+    transform:rotate(90deg);
+}
+/* POPUP */
+
+.popup{
+    position:fixed;
+    top:20px;
+    right:20px;
+    min-width:260px;
+    padding:14px 18px;
+    border-radius:10px;
+    color:white;
+    z-index:9999;
+    animation:slideIn .3s ease;
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
+    font-size:14px;
+}
+
+/* SUCCESS */
+
+.popup.success{
+    background:#22c55e;
+}
+
+/* ERROR */
+
+.popup.error{
+    background:#ef4444;
+}
+
+/* WARNING */
+
+.popup.warning{
+    background:#f59e0b;
+}
+
+/* INFO */
+
+.popup.info{
+    background:#06b6d4;
+}
+
+/* ANIMATION */
+
+@keyframes slideIn{
+
+    from{
+        opacity:0;
+        transform:translateX(100%);
+    }
+
+    to{
+        opacity:1;
+        transform:translateX(0);
+    }
+}
+.status{
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:12px;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+}
+
+/* ACTIVE */
+
+.status-active{
+    background:rgba(34,197,94,.12);
+    color:#22c55e;
+}
+
+/* INACTIVE */
+
+.status-inactive{
+    background:rgba(239,68,68,.12);
+    color:#ef4444;
+}
+.status{
+    border:none;
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:12px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+/* ACTIVE */
+
+.status-active{
+    background:rgba(34,197,94,.12);
+    color:#22c55e;
+}
+
+/* INACTIVE */
+
+.status-inactive{
+    background:rgba(239,68,68,.12);
+    color:#ef4444;
+}
+
+.status:hover{
+    opacity:.8;
+}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
  
@@ -431,6 +611,8 @@ a:hover {
     </div>
  
     <div class="nav-label">Management</div>
+    {% if role == "admin" %}
+
     <a href="/company-details/">
     <div class="nav-item {% if 'company' in request.path %}active{% endif %}">
         
@@ -443,6 +625,8 @@ a:hover {
       <span class="nav-badge">12</span>
     </div>
     </a>
+    {%endif%}
+    {% if role == "company" or role == "admin"%}
     <a href="/employee-details/">
     <div class="nav-item {% if 'employee' in request.path %}active{% endif %}">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -453,19 +637,78 @@ a:hover {
       <span class="nav-badge red">3</span>
     </div>
 </a>
-    <div class="nav-item">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-        <rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M5 7h6M5 10h4"/>
-      </svg>
-      Leads
+
+{%endif%}
+
+<!-- LEADS MENU -->
+
+<div class="nav-parent {% if 'lead' in request.path or 'source' in request.path or 'type' in request.path %}nav-open{% endif %}">
+
+    <!-- MAIN NAV -->
+
+    <div class="nav-item lead-toggle" onclick="toggleLeadMenu()">
+
+        <div class="lead-left">
+
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="2" y="3" width="12" height="10" rx="1.5"/>
+                <path d="M5 7h6M5 10h4"/>
+            </svg>
+
+            <span>Leads</span>
+
+        </div>
+
+        <svg
+            class="dropdown-arrow"
+            width="14"
+            height="14"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+        >
+            <path d="M6 4l4 4-4 4"/>
+        </svg>
+
     </div>
-    <div class="nav-item">
+
+    <!-- DROPDOWN -->
+
+    <div class="nav-dropdown">
+
+        <a
+            href="/leads/"
+            class="{% if 'leads' in request.path %}dropdown-active{% endif %}"
+        >
+            All Leads
+        </a>
+
+        <a
+            href="/lead-source/"
+            class="{% if 'lead-source' in request.path %}dropdown-active{% endif %}"
+        >
+            Lead Source
+        </a>
+
+        <a
+            href="/lead-type/"
+            class="{% if 'type' in request.path %}dropdown-active{% endif %}"
+        >
+            For Type
+        </a>
+
+    </div>
+
+</div>
+<a href = "/project/">
+    <div class="nav-item {% if 'project' in request.path %}active{% endif %}">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
         <path d="M14 2H2v12l3-2 3 2 3-2 3 2V2z"/>
       </svg>
-      Deals / Pipeline
+      Projects
     </div>
- 
+  </a>
     <div class="nav-label">System</div>
     <div class="nav-item">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -512,12 +755,7 @@ a:hover {
   <!-- TOPBAR -->
   <header class="topbar">
     <div class="page-title">Dashboard</div>
-    <div class="search-wrap">
-      <svg class="search-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-        <circle cx="7" cy="7" r="5"/><path d="M12 12l3 3"/>
-      </svg>
-      <input type="text" placeholder="Search companies, employees…"/>
-    </div>
+    
     <div class="topbar-btn">
       <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
         <path d="M8 2a2 2 0 0 1 2 2 4 4 0 0 1 2.7 5.2L11 12H5l-1.7-2.8A4 4 0 0 1 6 4a2 2 0 0 1 2-2z"/>
@@ -541,6 +779,13 @@ a:hover {
     </button>
     </a>
     {% endif %} {% endcomment %}
+    <a href="/logout/">
+    <button class="btn">
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+    </svg>
+    Logout
+    </button>
+    </a>
   </header>
  
   <div class="content">
@@ -560,6 +805,67 @@ a:hover {
       });
     });
   });
+
+function toggleLeadMenu(){
+
+    document
+    .querySelector('.nav-parent')
+    .classList
+    .toggle('nav-open');
+}
+
+/* POPUP AUTO HIDE */
+
+setTimeout(() => {
+
+    document
+    .querySelectorAll('.popup')
+    .forEach((popup) => {
+
+        popup.style.display = 'none';
+
+    });
+
+}, 3000);
+
+
+
+
+function deleteSource(event, url){
+
+    event.preventDefault();
+
+    Swal.fire({
+
+        title: 'Delete Source?',
+
+        text: "This action cannot be undone.",
+
+        icon: 'warning',
+
+        background: '#13161d',
+
+        color: 'white',
+
+        showCancelButton: true,
+
+        confirmButtonColor: '#ea5455',
+
+        cancelButtonColor: '#4f7cff',
+
+        confirmButtonText: 'Yes, Delete',
+
+        cancelButtonText: 'Cancel'
+
+    }).then((result) => {
+
+        if(result.isConfirmed){
+
+            window.location.href = url;
+        }
+    });
+}
+
 </script>
 </body>
 </html>

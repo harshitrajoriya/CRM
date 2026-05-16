@@ -135,7 +135,10 @@ tr:hover {
 <!-- SEARCH -->
 <div class="search-box">
     <form method="GET">
-        <input type="text" name="search" placeholder="Search Employee...">
+        <input type="text" name="search" placeholder="Search Employee..." value="{{request.GET.search}}">
+        <button type="submit">
+        Search
+    </button>
     </form>
 </div>
 <br>

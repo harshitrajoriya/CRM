@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+/* PAGE */
+.container{
+    width:100%;
+}
+
+/* HEADER */
+.page-header{
+    margin-bottom:20px;
+}
+
+.page-header h2{
+    margin-bottom:10px;
+}
+
+/* CARD */
+.card{
+    background:#13161d;
+    padding:20px;
+    border-radius:12px;
+    border:1px solid #222;
+    margin-bottom:20px;
+}
+
+/* FORM GRID */
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+}
+
+/* INPUTS */
+.form-grid input,
+.form-grid select{
+    width:100%;
+    padding:12px;
+    background:#1a1e28;
+    border:1px solid #2a2f3a;
+    border-radius:8px;
+    color:white;
+    outline:none;
+    font-size:14px;
+}
+
+.form-grid input:focus,
+.form-grid select:focus{
+    border-color:#4f7cff;
+}
+
+/* SELECT */
+select{
+    cursor:pointer;
+}
+
+/* BUTTON */
+.btn{
+    background:#4f7cff;
+    border:none;
+    padding:12px;
+    border-radius:8px;
+    color:white;
+    cursor:pointer;
+    font-size:14px;
+    transition:.2s;
+    width : 110px
+}
+
+.btn:hover{
+    background:#3d68e0;
+}
+
+/* FULL WIDTH */
+.full-width{
+    grid-column:span 3;
+}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .full-width{
+        grid-column:span 1;
+    }
+}
+</style>
+
+<div class="container">
+    <!-- HEADER -->
+    <div class="page-header">
+    <a href="/leads/">← Home</a>
+</div>
+    <div class="page-header">
+        <h2>Create Lead</h2>
+    </div>
+    
+
+    <!-- FORM -->
+    <div class="card">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="form-grid">
+
+                <!-- COMPANY NAME -->
+                <input 
+                    type="text"
+                    name="company_name"
+                    placeholder="Company Name (Optional)"
+                >
+
+                <!-- LEAD NAME -->
+                <input 
+                    type="text"
+                    name="lead_name"
+                    placeholder="Lead Name"
+                    required
+                >
+
+                <!-- LEAD PHONE -->
+                <input 
+                    type="text"
+                    name="lead_phone"
+                    placeholder="Phone Number"
+                    required
+                >
+
+                <!-- LEAD EMAIL -->
+                <input 
+                    type="email"
+                    name="lead_email"
+                    placeholder="Email Address"
+                >
+
+                <!-- ASSIGN USER -->
+                <select name="from_assign_user">
+
+                    <option value="">From Employee</option>
+
+                    {% for e in employees %}
+                    <option value="{{ e.id }}">
+                        {{ e.employee_name }}
+                    </option>
+                    {% endfor %}
+
+                </select>
+
+                <select name="to_assign_user">
+
+                    <option value="">Assign to Employee</option>
+
+                    {% for e in employees %}
+                    <option value="{{ e.id }}">
+                        {{ e.employee_name }}
+                    </option>
+                    {% endfor %}
+
+                </select>
+
+                <!-- LEAD SOURCE -->
+                <select name="lead_source">
+
+                    <option value="">Lead Source</option>
+
+                    {% for s in sources %}
+                    <option value="{{s.id}}">{{s.lead_source_name}}</option>
+                        {% endfor %}
+                </select>
+
+                <!-- FOR TYPE -->
+                <select name="for_type">
+
+                    <option value="">Lead Type</option>
+
+                    {%for t in types%}
+                    <option value="{{t.id}}">{{t.for_type_name}}</option>
+                    {%endfor%}
+                </select>
+
+                <!-- SUBMIT -->
+                <button class="btn full-width">
+                    Create Lead
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+    
+</div>
+
+{% endblock %}

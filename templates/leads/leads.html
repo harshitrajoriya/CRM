@@ -1,0 +1,417 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+/* PAGE */
+.container{
+    width:100%;
+}
+
+/* HEADER */
+.page-header{
+    margin-bottom:20px;
+}
+
+.page-header h2{
+    margin-bottom:10px;
+}
+
+/* CARD */
+.card{
+    background:#13161d;
+    padding:20px;
+    border-radius:12px;
+    border:1px solid #222;
+    margin-bottom:20px;
+}
+
+/* FORM GRID */
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+}
+
+/* INPUTS */
+.form-grid input,
+.form-grid select{
+    width:100%;
+    padding:12px;
+    background:#1a1e28;
+    border:1px solid #2a2f3a;
+    border-radius:8px;
+    color:white;
+    outline:none;
+    font-size:14px;
+}
+
+.form-grid input:focus,
+.form-grid select:focus{
+    border-color:#4f7cff;
+}
+
+/* SELECT */
+select{
+    cursor:pointer;
+}
+
+/* BUTTON */
+.btn{
+    background:#4f7cff;
+    border:none;
+    padding:12px;
+    border-radius:8px;
+    color:white;
+    cursor:pointer;
+    font-size:14px;
+    transition:.2s;
+}
+
+.btn:hover{
+    background:#3d68e0;
+}
+
+/* FULL WIDTH */
+.full-width{
+    grid-column:span 3;
+}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .full-width{
+        grid-column:span 1;
+    }
+}
+
+
+
+
+.table-wrap{
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    text-align:left;
+    padding:12px;
+    color:#888;
+    font-size:13px;
+}
+
+td{
+    padding:14px 12px;
+    border-top:1px solid #222;
+}
+
+tr:hover{
+    background:rgba(255,255,255,0.03);
+}
+
+.action a{
+    margin-right:10px;
+    font-size:13px;
+}
+
+.action a:first-child{
+    color:#4f7cff;
+}
+
+.action a:last-child{
+    color:#ff4d4d;
+}
+
+/* STATUS */
+
+.status-badge{
+    padding:6px 10px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:600;
+}
+
+.status-badge.pending{
+    background:rgba(255,159,67,.15);
+    color:#ff9f43;
+}
+
+.status-badge.active{
+    background:rgba(40,199,111,.15);
+    color:#28c76f;
+}
+
+.status-badge.inactive{
+    background:rgba(234,84,85,.15);
+    color:#ea5455;
+}
+  .search-wrap {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 0 12px; height: 34px; width: 220px;
+    transition: border .2s;
+  }
+  .search-wrap:focus-within { border-color: var(--accent); }
+  .search-wrap input {
+    background: none; border: none; outline: none;
+    color: var(--text); font-family: var(--font); font-size: 13px; width: 100%;
+  }
+  .search-wrap input::placeholder { color: var(--muted2); }
+  .search-icon { color: var(--muted2); flex-shrink: 0; }
+  /* SEARCH */
+.search-box input {
+    padding: 8px 12px;
+    width: 250px;
+    background: #1a1e28;
+    border: 1px solid #2a2f3a;
+    border-radius: 6px;
+    color: white;
+}
+</style>
+
+<div class="container">
+    {% if messages %}
+
+    {% for message in messages %}
+
+        {% if "Lead added successfully" in message|stringformat:"s" %}
+
+            <script>
+
+                Swal.fire({
+
+                    title: 'Success',
+
+                    text: 'Lead Added Successfully',
+
+                    icon: 'success',
+
+                    background: '#13161d',
+
+                    color: 'white',
+
+                    confirmButtonColor: '#4f7cff',
+
+                    showDenyButton: true,
+
+                    confirmButtonText: 'Add More',
+
+                    denyButtonText: 'Go Back'
+
+                }).then((result) => {
+
+                    if(result.isConfirmed){
+
+                        window.location.href = "/add-leads/";
+                    }
+
+                    else if(result.isDenied){
+
+                        window.location.href = "/leads/";
+                    }
+
+                });
+
+            </script>
+
+        {% elif "Lead deleted successfully" in message|stringformat:"s" %}
+
+            <script>
+
+                Swal.fire({
+
+                    title: 'Deleted',
+
+                    text: 'Lead Deleted Successfully',
+
+                    icon: 'success',
+
+                    background: '#13161d',
+
+                    color: 'white',
+
+                    confirmButtonColor: '#ea5455'
+
+                });
+
+            </script>
+
+        {% endif %}
+
+    {% endfor %}
+
+{% endif %}
+    <div class="page-header">
+    <a href="/dashboard/">← Home</a>
+</div>
+    <div class="page-header">
+        <h2>|  Leads</h2>
+    </div>{%if role == "company"%}
+    <a href="/add-leads">
+        <button class="btn">Add leads</button>
+    </a>   {%endif%}
+    <br>
+   <div class="search-box">
+    <form method="GET">
+        <input type="text" name="search" placeholder="Search Employee..." value="{{request.GET.search}}">
+        <button type="submit" class="btn">
+        Search
+    </button>
+    </form>
+</div>
+<br>
+    <div class="card">
+
+    <div class="table-wrap">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Lead ID</th>
+                    <th>Company</th>
+                    <th>Lead Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>From Assign</th>
+                    <th>To Assign</th>
+                    <th>Source</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Action</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for lead in leads %}
+
+                <tr>
+
+                    <td>{{ lead.leadid }}</td>
+                    <td>{{ lead.company_name }}</td>
+                    <td>{{ lead.lead_name }}</td>
+                    <td>{{ lead.lead_phone }}</td>
+                    <td>{{ lead.lead_email }}</td>
+                    <td>
+                        {{ lead.from_assign_user.employee_name }}
+                    </td>
+                    <td>
+                        {{ lead.to_assign_user.employee_name }}
+                    </td>
+                    <td>{{ lead.lead_source.lead_source_name }}</td>
+                    <td>{{ lead.for_type.for_type_name }}</td>
+                    <td>
+
+                        {% if lead.status == "new" %}
+                        <span class="status-badge pending">
+                            New
+                        </span>
+
+                        {% elif lead.status == "converted" %}
+                        <span class="status-badge active">
+                            Converted
+                        </span>
+
+                        {% elif lead.status == "closed" %}
+                        <span class="status-badge inactive">
+                            Closed
+                        </span>
+
+                        {% else %}
+                        <span class="status-badge">
+                            {{ lead.status }}
+                        </span>
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        {{ lead.created_at|date:"d M Y" }}
+                    </td>
+
+                    <td class="action">
+
+
+
+                    <a
+    href="/delete-lead/{{ lead.id }}"
+    onclick="deleteLead(event, this.href)"
+>
+    Delete
+</a>
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="12" style="text-align:center;">
+                        No Leads Found
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</div>
+<script>
+
+function deleteLead(event, url){
+
+    event.preventDefault();
+
+    Swal.fire({
+
+        title: 'Delete Lead?',
+
+        text: 'This action cannot be undone.',
+
+        icon: 'warning',
+
+        background: '#13161d',
+
+        color: 'white',
+
+        showCancelButton: true,
+
+        confirmButtonColor: '#ea5455',
+
+        cancelButtonColor: '#4f7cff',
+
+        confirmButtonText: 'Yes Delete',
+
+        cancelButtonText: 'Cancel'
+
+    }).then((result) => {
+
+        if(result.isConfirmed){
+
+            window.location.href = url;
+        }
+
+    });
+}
+
+</script>
+{% endblock %}

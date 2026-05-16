@@ -27,16 +27,24 @@ def login_view(request):
     return render(request, "login.html")
 
 def dashboard(request):
-    user=request.user   
-    user_role = Users.objects.filter(user=user).first()
-    companies = UserInfo.objects.filter(user__users__role="company")
-    companies_count = UserInfo.objects.filter(user__users__role="company").count()
-
+    user            = request.user   
+    user_role       = Users.objects.filter(user=user).first()
+    companies       = UserInfo.objects.filter(user__users__role="company")
+    role            = user_role.role if user_role else None
+    companies_count = companies.count()
     employees_count = EmployeeInfo.objects.count()
+    company = None
+    
+    if role == "company":
+        company=UserInfo.objects.filter(user=request.user).first()
+        
     context = {
         "user": user,
-        "role": user_role.role if user_role else None,
+        "role": role,
+        
         'companies': companies,
+        'company'  : company,
+        
         'companies_count':companies_count,
         'employees_count':employees_count
     }
@@ -46,3 +54,4 @@ def logout_view(request):
     logout(request)
     messages.success(request, "Logged out successfully")
     return redirect('login')
+

@@ -1,0 +1,450 @@
+<!-- templates/project/project_details.html -->
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+.container{
+    width:100%;
+}
+
+.top-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.back-btn{
+    text-decoration:none;
+    color:#aaa;
+    font-size:14px;
+}
+
+.back-btn:hover{
+    color:#4f7cff;
+}
+
+.card{
+    background:#13161d;
+    border:1px solid #222;
+    border-radius:14px;
+    padding:24px;
+    margin-bottom:20px;
+}
+
+.project-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.project-title h2{
+    margin:0;
+}
+
+.project-id{
+    color:#4f7cff;
+    font-size:14px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+}
+
+.info-box{
+    background:#1a1e28;
+    border:1px solid #2a2f3a;
+    border-radius:10px;
+    padding:16px;
+}
+
+.label{
+    color:#8b93a7;
+    font-size:13px;
+    margin-bottom:8px;
+}
+
+.value{
+    color:white;
+    font-size:15px;
+}
+
+.status{
+    display:inline-block;
+    padding:7px 14px;
+    border-radius:30px;
+    font-size:12px;
+    font-weight:600;
+}
+
+.not-started{
+    background:rgba(148,163,184,.15);
+    color:#94a3b8;
+}
+
+.in-progress{
+    background:rgba(59,130,246,.15);
+    color:#3b82f6;
+}
+
+.completed{
+    background:rgba(34,197,94,.15);
+    color:#22c55e;
+}
+
+.on-hold{
+    background:rgba(239,68,68,.15);
+    color:#ef4444;
+}
+
+.priority{
+    display:inline-block;
+    padding:7px 14px;
+    border-radius:30px;
+    font-size:12px;
+    font-weight:600;
+}
+
+.high{
+    background:rgba(239,68,68,.15);
+    color:#ef4444;
+}
+
+.medium{
+    background:rgba(245,158,11,.15);
+    color:#f59e0b;
+}
+
+.low{
+    background:rgba(34,197,94,.15);
+    color:#22c55e;
+}
+
+.description{
+    margin-top:20px;
+}
+
+.description-box{
+    background:#1a1e28;
+    border:1px solid #2a2f3a;
+    border-radius:10px;
+    padding:18px;
+    line-height:1.7;
+    color:#e2e8f0;
+}
+
+.action-buttons{
+    display:flex;
+    gap:12px;
+    margin-top:25px;
+}
+
+.btn{
+    padding:12px 18px;
+    border-radius:8px;
+    text-decoration:none;
+    font-size:14px;
+    transition:.2s;
+}
+
+.edit-btn{
+    background:#4f7cff;
+    color:white;
+}
+
+.edit-btn:hover{
+    background:#3d68e0;
+}
+
+.delete-btn{
+    background:#ef4444;
+    color:white;
+}
+
+.delete-btn:hover{
+    background:#dc2626;
+}
+
+@media(max-width:900px){
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    .project-title{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:10px;
+    }
+}
+
+</style>
+
+<div class="container">
+
+    <div class="top-bar">
+
+        <a href="/project/" class="back-btn">
+
+            ← Back To Projects
+
+        </a>
+
+    </div>
+
+    <div class="card">
+
+        <div class="project-title">
+
+            <div>
+
+                <h2>
+
+                    {{ project.project_name }}
+
+                </h2>
+
+                <div class="project-id">
+
+                    {{ project.project_id }}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- INFO GRID -->
+
+        <div class="grid">
+
+            <!-- CLIENT -->
+
+            <div class="info-box">
+
+                <div class="label">
+
+                    Client Name
+
+                </div>
+
+                <div class="value">
+
+                    {{ project.client_name }}
+
+                </div>
+
+            </div>
+
+            <!-- EMPLOYEE -->
+
+            <div class="info-box">
+
+                <div class="label">
+
+                    Assigned Employee
+
+                </div>
+
+                <div class="value">
+
+                    {{ project.assign_to.employee_name }}
+
+                </div>
+
+            </div>
+
+            <!-- START DATE -->
+
+            <div class="info-box">
+
+                <div class="label">
+
+                    Start Date
+
+                </div>
+
+                <div class="value">
+
+                    {% if project.start_date %}
+
+                        {{ project.start_date }}
+
+                    {% else %}
+
+                        Not Scheduled
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            <!-- END DATE -->
+
+            <div class="info-box">
+
+                <div class="label">
+
+                    End Date
+
+                </div>
+
+                <div class="value">
+
+                    {% if project.end_date %}
+
+                        {{ project.end_date }}
+
+                    {% else %}
+
+                        Not Scheduled
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            <!-- PRIORITY -->
+
+            <div class="info-box">
+
+                <div class="label">
+
+                    Priority
+
+                </div>
+
+                <div class="value">
+
+                    <span class="priority {{ project.priority }}">
+
+                        {{ project.priority }}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            <!-- STATUS -->
+
+            <div class="info-box">
+
+                <div class="label">
+
+                    Status
+
+                </div>
+
+                <div class="value">
+
+                    <span class="status {{ project.status|slugify }}">
+
+                        {{ project.status }}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- DESCRIPTION -->
+
+        <div class="description">
+
+            <div class="label">
+
+                Project Description
+
+            </div>
+
+            <div class="description-box">
+
+                {{ project.project_description }}
+
+            </div>
+
+        </div>
+
+        <!-- ACTIONS -->
+
+        <div class="action-buttons">
+
+            <a
+                href="/edit-project/{{ project.project_id }}/"
+                class="btn edit-btn"
+            >
+
+                Edit Project
+
+            </a>
+
+            <a
+                href="/delete-project/{{ project.project_id }}/"
+                class="btn delete-btn"
+                onclick="deleteProject(event, this.href)"
+            >
+
+                Delete Project
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function deleteProject(event, url){
+
+    event.preventDefault();
+
+    Swal.fire({
+
+        title: 'Delete Project?',
+
+        text: 'This action cannot be undone.',
+
+        icon: 'warning',
+
+        background: '#13161d',
+
+        color: 'white',
+
+        showCancelButton: true,
+
+        confirmButtonColor: '#ef4444',
+
+        cancelButtonColor: '#4f7cff',
+
+        confirmButtonText: 'Yes Delete',
+
+        cancelButtonText: 'Cancel'
+
+    }).then((result) => {
+
+        if(result.isConfirmed){
+
+            window.location.href = url;
+
+        }
+
+    });
+
+}
+
+</script>
+
+{% endblock %}

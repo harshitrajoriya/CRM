@@ -1,0 +1,383 @@
+<!-- templates/projects/add_project.html -->
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+.container{
+    width:100%;
+}
+
+.page-header{
+    margin-bottom:20px;
+}
+
+.card{
+    background:#13161d;
+    border:1px solid #222;
+    border-radius:12px;
+    padding:20px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.form-group label{
+    color:#cbd5e1;
+    font-size:14px;
+    font-weight:500;
+}
+
+.form-grid input,
+.form-grid textarea,
+.form-grid select{
+    width:100%;
+    padding:12px;
+    background:#1a1e28;
+    border:1px solid #2a2f3a;
+    border-radius:8px;
+    color:white;
+    outline:none;
+    font-size:14px;
+}
+
+.form-grid textarea{
+    resize:none;
+    height:120px;
+}
+
+.form-grid input:focus,
+.form-grid textarea:focus,
+.form-grid select:focus{
+    border-color:#4f7cff;
+}
+
+.full-width{
+    grid-column:span 2;
+}
+
+.btn{
+    background:#4f7cff;
+    border:none;
+    padding:12px;
+    border-radius:8px;
+    color:white;
+    cursor:pointer;
+    font-size:14px;
+    transition:.2s;
+    width:180px;
+}
+
+.btn:hover{
+    background:#3d68e0;
+}
+
+.back-btn{
+    text-decoration:none;
+    color:#aaa;
+}
+
+.back-btn:hover{
+    color:#4f7cff;
+}
+
+@media(max-width:900px){
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .full-width{
+        grid-column:span 1;
+    }
+}
+
+</style>
+
+<div class="container">
+{% if messages %}
+
+    {% for message in messages %}
+
+        {% if "Project Added Successfully" in message|stringformat:"s" %}
+
+            <script>
+
+                Swal.fire({
+
+                    title: 'Success',
+
+                    text: 'Project Added Successfully',
+
+                    icon: 'success',
+
+                    background: '#13161d',
+
+                    color: 'white',
+
+                    confirmButtonColor: '#4f7cff',
+
+                    showDenyButton: true,
+
+                    confirmButtonText: 'Add More',
+
+                    denyButtonText: 'Go Back'
+
+                }).then((result) => {
+
+                    // ADD MORE
+
+                    if(result.isConfirmed){
+
+                        window.location.href = "/add-project/";
+
+                    }
+
+                    // GO BACK
+
+                    else if(result.isDenied){
+
+                        window.location.href = "/project/";
+
+                    }
+
+                });
+
+            </script>
+
+        {% endif %}
+    {% endfor %}
+{% endif %}
+    <div class="page-header">
+
+        <a href="/project/" class="back-btn">
+
+            ← Back
+
+        </a>
+
+    </div>
+
+    <div class="card">
+
+        <h2 style="margin-bottom:24px;">
+
+            Add Project
+
+        </h2>
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="form-grid">
+
+                <!-- PROJECT NAME -->
+
+                <div class="form-group">
+
+                    <label>
+                        Project Name *
+                    </label>
+
+                    <input
+                        type="text"
+                        name="project_name"
+                        placeholder="Enter project name"
+                        required
+                    >
+
+                </div>
+
+                <!-- CLIENT NAME -->
+
+                <div class="form-group">
+
+                    <label>
+                        Client Name *
+                    </label>
+
+                    <input
+                        type="text"
+                        name="client_name"
+                        placeholder="Enter client name"
+                        required
+                    >
+
+                </div>
+
+                <!-- START DATE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Start Date
+                    </label>
+
+                    <input
+                        type="date"
+                        name="start_date"
+                    >
+
+                </div>
+
+                <!-- END DATE -->
+
+                <div class="form-group">
+
+                    <label>
+                        End Date
+                    </label>
+
+                    <input
+                        type="date"
+                        name="end_date"
+                    >
+
+                </div>
+
+                <!-- ASSIGN EMPLOYEE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Assign Employee *
+                    </label>
+
+                    <select
+                        name="assign_to"
+                        required
+                    >
+
+                        <option value="">
+                            Select Employee
+                        </option>
+
+                        {% for e in employees %}
+
+                        <option value="{{ e.id }}">
+
+                            {{ e.employee_name }}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+                <!-- PRIORITY -->
+
+                <div class="form-group">
+
+                    <label>
+                        Priority *
+                    </label>
+
+                    <select
+                        name="priority"
+                        required
+                    >
+
+                        <option value="">
+                            Select Priority
+                        </option>
+
+                        <option value="high">
+                            High
+                        </option>
+
+                        <option value="medium">
+                            Medium
+                        </option>
+
+                        <option value="low">
+                            Low
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- STATUS -->
+
+                <div class="form-group">
+
+                    <label>
+                        Status *
+                    </label>
+
+                    <select
+                        name="status"
+                        required
+                    >
+
+                        <option value="">
+                            Select Status
+                        </option>
+
+                        <option value="not started">
+                            Not Started
+                        </option>
+
+                        <option value="in progress">
+                            In Progress
+                        </option>
+
+                        <option value="on hold">
+                            On Hold
+                        </option>
+
+                        <option value="completed">
+                            Completed
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- DESCRIPTION -->
+
+                <div class="form-group full-width">
+
+                    <label>
+                        Project Description *
+                    </label>
+
+                    <textarea
+                        name="project_description"
+                        placeholder="Write project details..."
+                        required
+                    ></textarea>
+
+                </div>
+
+                <!-- BUTTON -->
+
+                <button class="btn full-width">
+
+                    Create Project
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
