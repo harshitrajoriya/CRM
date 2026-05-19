@@ -176,6 +176,36 @@ tr:hover{
     border-radius: 6px;
     color: white;
 }
+
+.view-btn{
+
+    background:#4f7cff;
+
+    color:white !important;
+
+    padding:7px 14px;
+
+    border-radius:8px;
+
+    text-decoration:none;
+
+    font-size:12px;
+}
+
+.delete-btn{
+
+    background:#ea5455;
+
+    color:white !important;
+
+    padding:7px 14px;
+
+    border-radius:8px;
+
+    text-decoration:none;
+
+    font-size:12px;
+}
 </style>
 
 <div class="container">
@@ -256,13 +286,13 @@ tr:hover{
     <div class="page-header">
         <h2>|  Leads</h2>
     </div>{%if role == "company"%}
-    <a href="/add-leads">
+    <a href="/add-leads/">
         <button class="btn">Add leads</button>
     </a>   {%endif%}
     <br>
    <div class="search-box">
     <form method="GET">
-        <input type="text" name="search" placeholder="Search Employee..." value="{{request.GET.search}}">
+        <input type="text" name="search" placeholder="Search by name, email..." value="{{request.GET.search}}">
         <button type="submit" class="btn">
         Search
     </button>
@@ -282,8 +312,6 @@ tr:hover{
                     <th>Company</th>
                     <th>Lead Name</th>
                     <th>Phone</th>
-                    <th>Email</th>
-                    <th>From Assign</th>
                     <th>To Assign</th>
                     <th>Source</th>
                     <th>Type</th>
@@ -304,9 +332,6 @@ tr:hover{
                     <td>{{ lead.company_name }}</td>
                     <td>{{ lead.lead_name }}</td>
                     <td>{{ lead.lead_phone }}</td>
-                    <td>{{ lead.lead_email }}</td>
-                    <td>
-                        {{ lead.from_assign_user.employee_name }}
                     </td>
                     <td>
                         {{ lead.to_assign_user.employee_name }}
@@ -315,12 +340,12 @@ tr:hover{
                     <td>{{ lead.for_type.for_type_name }}</td>
                     <td>
 
-                        {% if lead.status == "new" %}
+                        {% comment %} {% if lead.status == "new" %} {% endcomment %}
                         <span class="status-badge pending">
-                            New
+                            {{lead.status.lead_status_name}}
                         </span>
 
-                        {% elif lead.status == "converted" %}
+                        {% comment %} {% elif lead.status == "converted" %}
                         <span class="status-badge active">
                             Converted
                         </span>
@@ -334,7 +359,7 @@ tr:hover{
                         <span class="status-badge">
                             {{ lead.status }}
                         </span>
-                        {% endif %}
+                        {% endif %} {% endcomment %}
 
                     </td>
 
@@ -344,15 +369,26 @@ tr:hover{
 
                     <td class="action">
 
+    <a
+        href="/leads-details/{{ lead.leadid }}/"
+        class="view-btn"
+    >
 
+        View
 
-                    <a
-    href="/delete-lead/{{ lead.id }}"
-    onclick="deleteLead(event, this.href)"
->
-    Delete
-</a>
-                    </td>
+    </a>
+
+    <a
+        href="/delete-lead/{{ lead.id }}"
+        onclick="deleteLead(event, this.href)"
+        class="delete-btn"
+    >
+
+        Delete
+
+    </a>
+
+</td>
 
                 </tr>
 

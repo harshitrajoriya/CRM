@@ -52,6 +52,11 @@ urlpatterns = [
     path('inactive-lead-type/<int:id>/',   inactive_lead_type,  name='inactive_lead_type'),
     path('active-lead-type/<int:id>/',     active_lead_type,    name='active_lead_type'),
     path('delete-lead-type/<int:id>/',     delete_lead_type,    name='delete_lead_type'),
+    path('leads-details/<str:lead_id>/',   lead_details,        name='lead_details'),
+    path('lead-status/',                   lead_status,         name='lead_status'),
+    path('add-lead-status/',               add_lead_status,     name='add_lead_status'),
+    path('delete-lead-status/<int:id>/',   delete_lead_status,  name='delete_lead_status'),
+    path('active-lead-status/<int:id>/',   active_lead_status,  name='active_lead_status' ),   
     
     
     path('project/',                        project,            name='project'),

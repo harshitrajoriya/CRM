@@ -49,7 +49,7 @@ class Leads(models.Model):
     to_assign_user   = models.ForeignKey(EmployeeInfo,related_name="assigned", on_delete=models.CASCADE)
     lead_source      = models.ForeignKey("Leadsource",on_delete=models.CASCADE)
     for_type         = models.ForeignKey("ForType",on_delete=models.CASCADE)
-    status           = models.CharField(max_length=50,blank=True)
+    status           = models.ForeignKey("LeadStatus",on_delete=models.CASCADE)
     created_at       = models.DateTimeField(auto_now_add=True)
     updated_at       = models.DateTimeField(auto_now=True)
     deleted_at       = models.DateTimeField(blank=True,null=True)
@@ -104,4 +104,19 @@ class Project(models.Model):
         if not self. project_id:
             self. project_id = f'PJ-{self.id:05d}'
             Project.objects.filter(pk=self.pk).update(project_id=self.project_id)
-            
+
+class LeadStatus(models.Model):
+    STATUS_CHOICES = [
+        ('active','Active'),
+        ('inactive','Inactive'),
+    ]
+    lead_status_name = models.CharField(max_length=50)
+    leadstatus_status = models.CharField(max_length=20,choices=STATUS_CHOICES,default='active')
+    
+class LeadHistory(models.Model):
+    lead = models.ForeignKey(Leads,related_name="history",on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(EmployeeInfo,on_delete=models.CASCADE)
+    status = models.ForeignKey(LeadStatus,on_delete=models.CASCADE)
+    expected_date = models.DateField(blank=True,null=True)  
+    notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)

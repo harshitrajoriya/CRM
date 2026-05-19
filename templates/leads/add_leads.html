@@ -185,6 +185,15 @@ select{
                     <option value="{{t.id}}">{{t.for_type_name}}</option>
                     {%endfor%}
                 </select>
+                
+                <select name="Status">
+
+                    <option value="">Status</option>
+
+                    {%for t in statuses%}
+                    <option value="{{t.id}}">{{t.lead_status_name}}</option>
+                    {%endfor%}
+                </select>
 
                 <!-- SUBMIT -->
                 <button class="btn full-width">

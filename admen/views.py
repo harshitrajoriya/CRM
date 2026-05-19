@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
-from accounts.models import UserInfo, Users, EmployeeInfo, Leads, Leadsource, ForType
+from accounts.models import *
 from django.contrib import messages
 from django.db.models import Q
 # Create your views here.
@@ -93,7 +93,7 @@ def leads(request):
     role = Users.objects.get(user=request.user).role
     employees = EmployeeInfo.objects.all()
 
-    leads = Leads.objects.all()
+    leads = Leads.objects.all().order_by('-id')
     search = request.GET.get("search")
     if search:
         leads = leads.filter(
@@ -113,6 +113,7 @@ def add_leads(request):
     employees = EmployeeInfo.objects.all()
     types = ForType.objects.all()
     sources = Leadsource.objects.all()
+    statuses = LeadStatus.objects.filter(leadstatus_status = 'active')
     
     if request.method == "POST":
         company_name     = request.POST.get("company_name")
@@ -120,6 +121,7 @@ def add_leads(request):
         lead_phone       = request.POST.get("lead_phone")
         lead_email       = request.POST.get("lead_email")
         
+        lead_status      = LeadStatus.objects.get(id=request.POST.get("Status"))
         lead_source      = Leadsource.objects.get(id=request.POST.get("lead_source"))
         for_type         = ForType.objects.get(id=request.POST.get("for_type"))
         
@@ -127,16 +129,16 @@ def add_leads(request):
         to_assign_user   = EmployeeInfo.objects.filter(id= request.POST.get("to_assign_user")).first()
         
         Leads.objects.create(
-            company = company,
-            company_name = company_name,
-            lead_name = lead_name,
-            lead_phone = lead_phone,
-            lead_email = lead_email,
+            company          = company,
+            company_name     = company_name,
+            lead_name        = lead_name,
+            lead_phone       = lead_phone,
+            lead_email       = lead_email,
             from_assign_user = from_assign_user,
-            to_assign_user = to_assign_user,
-            lead_source = lead_source,
-            for_type = for_type,
-            status = "new",
+            to_assign_user   = to_assign_user,
+            lead_source      = lead_source,
+            for_type         = for_type,
+            status           = lead_status,
         )
         messages.success(request,"Lead added successfully")
         return redirect('leads')
@@ -145,6 +147,7 @@ def add_leads(request):
         'role': role,
         'types':types,
         'sources':sources,
+        'statuses':statuses,
     }
     return render(request,"leads/add_leads.html",context)
 
@@ -234,8 +237,98 @@ def inactive_lead_type(request,id):
     return redirect('for_type')
 
 def active_lead_type(request,id):
-    type=ForType.objects.get(id=id)
+    type=ForType.objects.get(id=id)     
     type.for_type_status = 'active'
     type.save()
     messages.success(request,"Lead type activated")
     return redirect('for_type')
+
+def lead_details(request,lead_id):
+    role=Users.objects.get(user=request.user).role
+    lead = Leads.objects.filter(leadid=lead_id).first()
+    status = LeadStatus.objects.filter(leadstatus_status = 'active')
+    history = LeadHistory.objects.filter(lead = lead).order_by('-id')
+    
+    if request.method == "POST":
+        expected_closing = request.POST.get("expected_closing")
+        statuses         = request.POST.get("status")
+        notes            = request.POST.get("notes")
+        
+        status_obj = LeadStatus.objects.filter(id = statuses).first()
+        
+        lead.status = status_obj
+        lead.save()
+        
+        LeadHistory.objects.create(
+            lead = lead,
+            expected_date = expected_closing,
+            updated_by = EmployeeInfo.objects.filter(user=request.user).first(),
+            status = status_obj,
+            notes = notes
+        )
+        messages.success(request,"Lead updated successfully")
+        return redirect('leads')
+    context={
+        'role':role,
+        'lead':lead,
+        'status':status,
+        'history':history,
+    }
+    return render(request,"leads/lead_details.html",context)
+
+
+def lead_status(request):
+    role = Users.objects.get(user=request.user).role
+    statuses = LeadStatus.objects.all()
+
+    context = {
+        'role' : role,
+        'statuses' : statuses,
+    }
+    return render(request,"leads/lead_status.html",context)
+
+# ADD PAGE
+
+def add_lead_status(request):
+    role = Users.objects.get(user=request.user).role
+    
+    if request.method == "POST":
+        lead_status_name  = request.POST.get("lead_status_name")
+        leadstatus_status = request.POST.get("leadstatus_status")
+    
+        LeadStatus.objects.create(
+            lead_status_name = lead_status_name,
+            leadstatus_status = leadstatus_status,
+        )
+        messages.success(request,"Status Added Successfull")
+        return redirect('lead_status')
+    
+    context = {
+        'role':role,
+    }
+    return render(request,"leads/add_lead_status.html",context)
+
+
+# DELETE
+
+def delete_lead_status(request, id):
+    LeadStatus.objects.get(id=id).delete()
+    messages.success(request,"Status Deleted")
+    return redirect('lead_status')
+
+
+# ACTIVE / INACTIVE
+
+def active_lead_status(request, id):
+    
+    lead = LeadStatus.objects.filter(id=id).first()
+    if lead.leadstatus_status == "active":
+        lead.leadstatus_status = "inactive"
+    
+    else :
+        lead.leadstatus_status = "active"
+    
+    lead.save()
+    messages.success(request,"Lead Status Updated Successfully")
+
+    return redirect('lead_status')
