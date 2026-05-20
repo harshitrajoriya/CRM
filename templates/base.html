@@ -642,7 +642,7 @@ a:hover {
 
 <!-- LEADS MENU -->
 
-<div class="nav-parent {% if 'lead' in request.path or 'source' in request.path or 'type' in request.path %}nav-open{% endif %}">
+<div class="nav-parent {% if 'lead' in request.path or 'source' in request.path or 'type' in request.path or 'reminders' in request.path %}nav-open{% endif %}">
 
     <!-- MAIN NAV -->
 
@@ -704,6 +704,14 @@ a:hover {
         >
             Status
         </a>
+
+        <a href="/reminders/"
+        class="{% if 'reminder' in request.path %}dropdown-active{% endif %}">
+          
+
+        Reminders
+
+      </a>
 
     </div>
 

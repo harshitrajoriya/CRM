@@ -1,0 +1,449 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+.container{
+    width:100%;
+}
+
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.back-btn{
+    text-decoration:none;
+    color:#aaa;
+}
+
+.back-btn:hover{
+    color:#4f7cff;
+}
+
+.card{
+    background:#13161d;
+    border:1px solid #222;
+    border-radius:14px;
+    padding:20px;
+}
+
+.table-wrap{
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    text-align:left;
+    padding:14px;
+    color:#9ca3af;
+    border-bottom:1px solid #222;
+    font-size:14px;
+}
+
+td{
+    padding:16px 14px;
+    border-bottom:1px solid #222;
+    color:white;
+    font-size:14px;
+}
+
+.lead-badge{
+    background:rgba(79,124,255,.15);
+    color:#4f7cff;
+    padding:7px 14px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:600;
+}
+
+.note-box{
+    max-width:320px;
+    line-height:1.6;
+    color:#d1d5db;
+}
+
+.date-box{
+    color:#22c55e;
+    font-weight:600;
+}
+
+.time-box{
+    color:#f59e0b;
+}
+
+.pending-badge{
+    background:rgba(245,158,11,.15);
+    color:#f59e0b;
+    padding:7px 12px;
+    border-radius:20px;
+    font-size:12px;
+}
+
+.completed-badge{
+    background:rgba(34,197,94,.15);
+    color:#22c55e;
+    padding:7px 12px;
+    border-radius:20px;
+    font-size:12px;
+}
+
+.action-group{
+    display:flex;
+    gap:10px;
+}
+
+.view-btn{
+    background:#4f7cff;
+    color:white;
+    padding:8px 14px;
+    border-radius:8px;
+    text-decoration:none;
+    font-size:13px;
+}
+
+.complete-btn{
+    background:#22c55e;
+    color:white;
+    padding:8px 14px;
+    border-radius:8px;
+    text-decoration:none;
+    font-size:13px;
+}
+
+.delete-btn{
+    background:#ef4444;
+    color:white;
+    padding:8px 14px;
+    border-radius:8px;
+    text-decoration:none;
+    font-size:13px;
+}
+
+.empty-box{
+    text-align:center;
+    padding:40px;
+    color:#9ca3af;
+}
+
+
+.top-buttons{
+    display:flex;
+    gap:12px;
+    margin-bottom:20px;
+}
+
+.filter-btn{
+    background:#1a1e28;
+    border:1px solid #2a2f3a;
+    color:white;
+    padding:10px 18px;
+    border-radius:10px;
+    text-decoration:none;
+    transition:.2s;
+}
+.filter-btn:hover{
+    background:#4f7cff;
+}
+
+
+.top-buttons{
+
+    display:flex;
+
+    gap:12px;
+
+    margin-bottom:20px;
+}
+
+.filter-btn{
+
+    background:#1a1e28;
+
+    border:1px solid #2a2f3a;
+
+    color:white;
+
+    padding:10px 18px;
+
+    border-radius:10px;
+
+    text-decoration:none;
+
+    transition:.2s;
+}
+
+.filter-btn:hover{
+
+    background:#4f7cff;
+}
+
+.active-filter{
+
+    background:#4f7cff;
+
+    border-color:#4f7cff;
+}
+</style>
+
+<div class="container">
+
+    <div class="page-header">
+
+        <a href="/leads/" class="back-btn">
+
+            ← Back To Leads
+
+        </a>
+
+        <h2>
+
+            {{ title }}
+
+        </h2>
+
+    </div>
+
+    <div class="card">
+
+        <div class="table-wrap">
+            <div class="top-buttons">
+
+    <a
+        href="/reminders/"
+        class="filter-btn {% if title == 'All Reminders' %}active-filter{% endif %}"
+    >
+
+        All
+
+    </a>
+
+    <a
+        href="/today-reminders/"
+        class="filter-btn {% if title == "Today's Reminders" %}active-filter{% endif %}"
+    >
+
+        Today
+
+    </a>
+
+    <a
+        href="/tomorrow-reminders/"
+        class="filter-btn {% if title == 'Tomorrow Reminders' %}active-filter{% endif %}"
+    >
+
+        Tomorrow
+
+    </a>
+
+</div>
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Lead</th>
+
+                        <th>Date</th>
+
+                        <th>Time</th>
+
+                        <th>Note</th>
+
+                        <th>Status</th>
+
+                        <th>Created</th>
+
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for r in reminders %}
+
+                    <tr>
+
+                        <td>
+
+                            <span class="lead-badge">
+
+                                {{ r.lead.leadid }}
+
+                            </span>
+
+                            <br><br>
+
+                            {{ r.lead.lead_name }}
+
+                        </td>
+
+                        <td class="date-box">
+
+                            {{ r.reminder_date }}
+
+                        </td>
+
+                        <td class="time-box">
+
+                            {{ r.reminder_time }}
+
+                        </td>
+
+                        <td>
+
+                            <div class="note-box">
+
+                                {{ r.reminder_note }}
+
+                            </div>
+
+                        </td>
+
+                        <td>
+
+                            {% if r.is_completed %}
+
+                            <span class="completed-badge">
+
+                                Completed
+
+                            </span>
+
+                            {% else %}
+
+                            <span class="pending-badge">
+
+                                Pending
+
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            {{ r.created_at|date:"d M Y h:i A" }}
+
+                        </td>
+
+                        <td>
+
+                            <div class="action-group">
+
+                                <a
+                                    href="/leads-details/{{ r.lead.leadid }}/"
+                                    class="view-btn"
+                                >
+
+                                    View
+
+                                </a>
+
+                                {% if not r.is_completed %}
+
+                                <a
+                                    href="/complete-reminder/{{ r.id }}/"
+                                    class="complete-btn"
+                                >
+
+                                    Complete
+
+                                </a>
+
+                                {% endif %}
+
+                                <a
+                                    href="/delete-reminder/{{ r.id }}/"
+                                    class="delete-btn"
+                                    onclick="deleteReminder(event,this.href)"
+                                >
+
+                                    Delete
+
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td colspan="7" class="empty-box">
+
+                            No Reminders Found
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function deleteReminder(event, url){
+
+    event.preventDefault();
+
+    Swal.fire({
+
+        title: 'Delete Reminder?',
+
+        text: 'Reminder will be archived.',
+
+        icon: 'warning',
+
+        background: '#13161d',
+
+        color: 'white',
+
+        showCancelButton: true,
+
+        confirmButtonColor: '#ef4444',
+
+        cancelButtonColor: '#4f7cff',
+
+        confirmButtonText: 'Yes Delete',
+
+        cancelButtonText: 'Cancel'
+
+    }).then((result) => {
+
+        if(result.isConfirmed){
+
+            window.location.href = url;
+
+        }
+
+    });
+
+}
+
+</script>
+
+{% endblock %}

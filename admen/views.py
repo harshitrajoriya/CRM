@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from accounts.models import *
 from django.contrib import messages
 from django.db.models import Q
+from datetime import date, timedelta
 # Create your views here.
 def add_company(request):
     if request.method=="POST":
@@ -244,45 +245,63 @@ def active_lead_type(request,id):
     return redirect('for_type')
 
 def lead_details(request,lead_id):
-    role=Users.objects.get(user=request.user).role
-    lead = Leads.objects.filter(leadid=lead_id).first()
-    status = LeadStatus.objects.filter(leadstatus_status = 'active')
-    history = LeadHistory.objects.filter(lead = lead).order_by('-id')
+    role      = Users.objects.get(user=request.user).role
+    lead      = Leads.objects.filter(leadid=lead_id).first()
+    status    = LeadStatus.objects.filter(leadstatus_status = 'active')
+    history   = LeadHistory.objects.filter(lead = lead).order_by('-id')
+    reminders = Reminder.objects.filter(lead = lead).order_by('-id')
     
     if request.method == "POST":
-        expected_closing = request.POST.get("expected_closing")
-        statuses         = request.POST.get("status")
-        notes            = request.POST.get("notes")
         
-        status_obj = LeadStatus.objects.filter(id = statuses).first()
+        if request.POST.get("form_type") == "reminder_form":
+            reminder_date = request.POST.get("reminder_date")or None
+            reminder_time = request.POST.get("reminder_time")or None
+            reminder_note = request.POST.get("reminder_note")or None
+            Reminder.objects.create(
+                lead          = lead,
+                reminder_date = reminder_date,
+                reminder_time = reminder_time,
+                reminder_note = reminder_note,
+            )
+            messages.success(request,"Reminder Added Successfully")
+            return redirect('lead_details',lead_id=lead.leadid)
         
-        lead.status = status_obj
-        lead.save()
+        elif request.POST.get("form_type") == "lead_update":
+            expected_closing = request.POST.get("expected_closing")or None
+            statuses         = request.POST.get("status")
+            notes            = request.POST.get("notes")
         
-        LeadHistory.objects.create(
-            lead = lead,
-            expected_date = expected_closing,
-            updated_by = EmployeeInfo.objects.filter(user=request.user).first(),
-            status = status_obj,
-            notes = notes
-        )
-        messages.success(request,"Lead updated successfully")
-        return redirect('leads')
+            status_obj = LeadStatus.objects.filter(id = statuses).first()
+        
+            lead.status = status_obj
+            lead.save()
+        
+            LeadHistory.objects.create(
+                lead          = lead,
+                expected_date = expected_closing,
+                updated_by    = EmployeeInfo.objects.filter(user=request.user).first(),
+                status        = status_obj,
+                notes         = notes
+            )
+            messages.success(request,"Lead updated successfully")
+            return redirect('lead_details',lead_id=lead.leadid)
+
     context={
-        'role':role,
-        'lead':lead,
-        'status':status,
-        'history':history,
+        'role'     :role,
+        'lead'     :lead,
+        'status'   :status,
+        'history'  :history,
+        'reminders':reminders,
     }
     return render(request,"leads/lead_details.html",context)
 
 
 def lead_status(request):
-    role = Users.objects.get(user=request.user).role
+    role     = Users.objects.get(user=request.user).role
     statuses = LeadStatus.objects.all()
 
     context = {
-        'role' : role,
+        'role'     : role,
         'statuses' : statuses,
     }
     return render(request,"leads/lead_status.html",context)
@@ -332,3 +351,61 @@ def active_lead_status(request, id):
     messages.success(request,"Lead Status Updated Successfully")
 
     return redirect('lead_status')
+
+def reminders(request):
+    role = Users.objects.get(user=request.user).role
+    company = UserInfo.objects.filter(user=request.user).first()
+    reminders = Reminder.objects.filter(is_deleted=False).order_by('-id')
+    context = {
+        'role':role,
+        'reminders':reminders,
+        'title': 'All Reminders',
+    }
+    return render(request,'leads/all_reminder.html',context)
+
+# COMPLETE REMINDER
+
+def complete_reminder(request, id):
+    reminder = Reminder.objects.filter(id=id).first()
+    reminder.is_completed = True
+    reminder.save()
+    messages.success(request,"Reminder Completed Successfully")
+    return redirect('reminders')
+
+# DELETE REMINDER
+
+def delete_reminder(request, id):
+    reminder = Reminder.objects.filter(id=id).first()
+    reminder.is_deleted = True
+    reminder.save()
+    messages.success(request,"Reminder Deleted Successfully")
+    return redirect('reminders')
+    
+def today_reminders(request):
+    role = Users.objects.get(user=request.user).role
+    today = date.today()
+    reminders = Reminder.objects.filter(reminder_date=today,is_deleted=False).order_by('reminder_time')
+    context = {
+        'role':role,
+        'title': "Today's Reminders",
+        'reminders': reminders,
+    }
+    return render(request,"leads/all_reminder.html",context)
+
+def tomorrow_reminders(request):
+    role = Users.objects.get(user=request.user).role
+    tomorrow = date.today() + timedelta(days=1)
+    reminders = Reminder.objects.filter(
+        reminder_date=tomorrow,
+        is_deleted=False
+    ).order_by('reminder_time')
+    context = {
+        'role':role,
+        'title': "Tomorrow Reminders",
+        'reminders': reminders,
+    }
+    return render(
+        request,
+        "leads/all_reminder.html",
+        context
+    )

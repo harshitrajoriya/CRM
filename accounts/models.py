@@ -110,13 +110,22 @@ class LeadStatus(models.Model):
         ('active','Active'),
         ('inactive','Inactive'),
     ]
-    lead_status_name = models.CharField(max_length=50)
+    lead_status_name  = models.CharField(max_length=50)
     leadstatus_status = models.CharField(max_length=20,choices=STATUS_CHOICES,default='active')
     
 class LeadHistory(models.Model):
-    lead = models.ForeignKey(Leads,related_name="history",on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(EmployeeInfo,on_delete=models.CASCADE)
-    status = models.ForeignKey(LeadStatus,on_delete=models.CASCADE)
+    lead          = models.ForeignKey(Leads,related_name="history",on_delete=models.CASCADE)
+    updated_by    = models.ForeignKey(EmployeeInfo,on_delete=models.CASCADE)
+    status        = models.ForeignKey(LeadStatus,on_delete=models.CASCADE)
     expected_date = models.DateField(blank=True,null=True)  
-    notes = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    notes         = models.TextField(blank=True)
+    created_at    = models.DateTimeField(auto_now_add=True)
+
+class Reminder(models.Model):
+    lead          = models.ForeignKey(Leads,on_delete=models.CASCADE,related_name="reminder")
+    reminder_date = models.DateField(blank=True,null=True)
+    reminder_time = models.TimeField(blank=True,null=True)
+    reminder_note = models.TextField(blank=True,null=True)
+    created_at    = models.DateTimeField(auto_now_add=True)
+    is_completed  = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)

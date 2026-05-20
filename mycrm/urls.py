@@ -58,6 +58,22 @@ urlpatterns = [
     path('delete-lead-status/<int:id>/',   delete_lead_status,  name='delete_lead_status'),
     path('active-lead-status/<int:id>/',   active_lead_status,  name='active_lead_status' ),   
     
+    path('reminders/',                       reminders,         name='reminders' ),
+    path('complete-reminder/<int:id>/',      complete_reminder, name='complete_reminder'),
+    path('delete-reminder/<int:id>/',        delete_reminder,   name='delete_reminder'),
+
+path(
+    'today-reminders/',
+    today_reminders,
+    name='today_reminders'
+),
+
+path(
+    'tomorrow-reminders/',
+    tomorrow_reminders,
+    name='tomorrow_reminders'
+),
+    
     
     path('project/',                        project,            name='project'),
     path('add-project/',                    add_project,        name='add_project'),

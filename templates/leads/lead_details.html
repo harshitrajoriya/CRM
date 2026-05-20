@@ -297,6 +297,99 @@
 
     color:#9ca3af;
 }
+.main-layout{
+
+    display:grid;
+
+    grid-template-columns:1.2fr .8fr;
+
+    gap:20px;
+
+    align-items:start;
+}
+
+.left-side,
+.right-side{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:20px;
+}
+
+.reminder-card{
+
+    background:#13161d;
+
+    border:1px solid #222;
+
+    border-radius:14px;
+
+    padding:20px;
+}
+
+.reminder-history{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:14px;
+}
+
+.reminder-item{
+
+    background:#1a1e28;
+
+    border:1px solid #2a2f3a;
+
+    border-radius:10px;
+
+    padding:14px;
+}
+
+.reminder-top{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-bottom:10px;
+}
+
+.reminder-date{
+
+    color:#4f7cff;
+
+    font-size:13px;
+
+    font-weight:600;
+}
+
+.reminder-time{
+
+    color:#9ca3af;
+
+    font-size:13px;
+}
+
+.reminder-note{
+
+    color:white;
+
+    line-height:1.6;
+
+    font-size:14px;
+}
+
+@media(max-width:1000px){
+
+    .main-layout{
+
+        grid-template-columns:1fr;
+    }
+}
 </style>
 
 <div class="container">
@@ -311,393 +404,487 @@
 
     </div>
 
-    <div class="card">
+    <div class="main-layout">
 
-        <div class="title">
+        <!-- LEFT SIDE -->
 
-            <h2>
+        <div class="left-side">
 
-                {{ lead.lead_name }}
+            <div class="card">
 
-            </h2>
+                <div class="title">
 
-            <div class="lead-id">
+                    <h2>
 
-                {{ lead.leadid }}
+                        {{ lead.lead_name }}
 
-            </div>
+                    </h2>
 
-        </div>
+                    <div class="lead-id">
 
-        <!-- VIEW SECTION -->
+                        {{ lead.leadid }}
 
-        <h3 class="section-title">
-
-            Lead Information
-
-        </h3>
-
-        <div class="grid">
-
-            <div class="info-box">
-
-                <div class="label">
-
-                    Company Name
+                    </div>
 
                 </div>
 
-                <div class="value">
+                <!-- LEAD INFO -->
 
-                    {{ lead.company_name }}
+                <h3 class="section-title">
 
-                </div>
+                    Lead Information
 
-            </div>
+                </h3>
 
-            <div class="info-box">
+                <div class="grid">
 
-                <div class="label">
+                    <div class="info-box">
 
-                    Phone Number
+                        <div class="label">
 
-                </div>
+                            Company Name
 
-                <div class="value">
+                        </div>
 
-                    {{ lead.lead_phone }}
+                        <div class="value">
 
-                </div>
+                            {{ lead.company_name }}
 
-            </div>
+                        </div>
 
-            <div class="info-box">
+                    </div>
 
-                <div class="label">
+                    <div class="info-box">
 
-                    Email Address
+                        <div class="label">
 
-                </div>
+                            Phone Number
 
-                <div class="value">
+                        </div>
 
-                    {{ lead.lead_email }}
+                        <div class="value">
 
-                </div>
+                            {{ lead.lead_phone }}
 
-            </div>
+                        </div>
 
-            <div class="info-box">
+                    </div>
 
-                <div class="label">
+                    <div class="info-box">
 
-                    Lead Source
+                        <div class="label">
 
-                </div>
+                            Email Address
 
-                <div class="value">
+                        </div>
 
-                    {{ lead.lead_source.lead_source_name }}
+                        <div class="value">
 
-                </div>
+                            {{ lead.lead_email }}
 
-            </div>
+                        </div>
 
-            <div class="info-box">
+                    </div>
 
-                <div class="label">
+                    <div class="info-box">
 
-                    Lead Type
+                        <div class="label">
 
-                </div>
+                            Lead Source
 
-                <div class="value">
+                        </div>
 
-                    {{ lead.for_type.for_type_name }}
+                        <div class="value">
 
-                </div>
+                            {{ lead.lead_source.lead_source_name }}
 
-            </div>
+                        </div>
 
-            <div class="info-box">
+                    </div>
 
-                <div class="label">
+                    <div class="info-box">
 
-                    From Assign
+                        <div class="label">
 
-                </div>
+                            Lead Type
 
-                <div class="value">
+                        </div>
 
-                    {{ lead.from_assign_user.employee_name }}
+                        <div class="value">
 
-                </div>
+                            {{ lead.for_type.for_type_name }}
 
-            </div>
+                        </div>
 
-            <div class="info-box">
+                    </div>
 
-                <div class="label">
+                    <div class="info-box">
 
-                    To Assign
+                        <div class="label">
 
-                </div>
+                            Current Status
 
-                <div class="value">
+                        </div>
 
-                    {{ lead.to_assign_user.employee_name }}
+                        <div class="value">
 
-                </div>
+                            <span class="status-badge">
 
-            </div>
+                                {{ lead.status.lead_status_name }}
 
-            <div class="info-box">
+                            </span>
 
-                <div class="label">
+                        </div>
 
-                    Current Status
-
-                </div>
-
-                <div class="value">
-
-                    <span class="status-badge">
-
-                        {{ lead.status.lead_status_name }}
-
-                    </span>
+                    </div>
 
                 </div>
 
             </div>
 
-            <div class="info-box">
+            <!-- UPDATE LEAD -->
 
-                <div class="label">
+            <div class="card">
 
-                    Created At
+                <form method="POST">
 
-                </div>
-
-                <div class="value">
-
-                    {{ lead.created_at|date:"d M Y h:i A" }}
-
-                </div>
-
-            </div>
-
-        </div>
-
-        {% if role == "employee" %}
-
-        <!-- UPDATE SECTION -->
-
-        <form method="POST">
-
-            {% csrf_token %}
-
-            <h3 class="section-title input-title">
-
-                Update Lead
-
-            </h3>
-
-            <div class="input-container">
-
-                <!-- EXPECTED CLOSING -->
-
-                <div class="input-box">
-
-                    <label>
-
-                        Expected Closing
-
-                    </label>
+                    {% csrf_token %}
 
                     <input
-                        type="date"
-                        name="expected_closing"
-                        class="custom-input"
-                    >
+        type="hidden"
+        name="form_type"
+        value="lead_update"
+    >
 
-                </div>
+                    <h3 class="section-title">
 
-                <!-- STATUS -->
+                        Update Lead
 
-                <div class="input-box">
+                    </h3>
 
-                    <label>
+                    <div class="input-container">
 
-                        Update Status
+                        <div class="input-box">
 
-                    </label>
+                            <label>
 
-                    <select
-                        name="status"
-                        class="custom-input"
-                    >
+                                Expected Closing
 
-                        {% for s in status %}
+                            </label>
 
-                        <option
-                            value="{{ s.id }}"
+                            <input
+                                type="date"
+                                name="expected_closing"
+                                class="custom-input"
+                            >
 
-                            {% if lead.status.id == s.id %}
+                        </div>
 
-                                selected
+                        <div class="input-box">
+
+                            <label>
+
+                                Update Status
+
+                            </label>
+
+                            <select
+                                name="status"
+                                class="custom-input"
+                            >
+
+                                {% for s in status %}
+
+                                <option
+                                    value="{{ s.id }}"
+
+                                    {% if lead.status.id == s.id %}
+
+                                        selected
+
+                                    {% endif %}
+                                >
+
+                                    {{ s.lead_status_name }}
+
+                                </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+                        <div class="input-box full-width">
+
+                            <label>
+
+                                Notes
+
+                            </label>
+
+                            <textarea
+                                name="notes"
+                                class="custom-textarea"
+                                placeholder="Write notes..."
+                            ></textarea>
+
+                        </div>
+
+                        <div class="full-width">
+
+                            <button class="save-btn">
+
+                                Save Changes
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+            <!-- LEAD HISTORY -->
+
+            <div class="card">
+
+                <h3 class="section-title">
+
+                    Lead History
+
+                </h3>
+
+                <div class="history-container">
+
+                    {% for h in history %}
+
+                    <div class="history-card">
+
+                        <div class="history-top">
+
+                            <div class="history-status">
+
+                                {{ h.status.lead_status_name }}
+
+                            </div>
+
+                            <div class="history-date">
+
+                                {{ h.created_at|date:"d M Y h:i A" }}
+
+                            </div>
+
+                        </div>
+
+                        <div class="history-body">
+
+                            <div class="history-item">
+
+                                <span>
+
+                                    Updated By:
+
+                                </span>
+
+                                {{ h.updated_by.employee_name }}
+
+                            </div>
+
+                            {% if h.expected_date %}
+
+                            <div class="history-item">
+
+                                <span>
+
+                                    Expected Closing:
+
+                                </span>
+
+                                {{ h.expected_date }}
+
+                            </div>
 
                             {% endif %}
+
+                            {% if h.notes %}
+
+                            <div class="history-notes">
+
+                                {{ h.notes }}
+
+                            </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                    {% empty %}
+
+                    <div class="empty-history">
+
+                        No History Found
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT SIDE -->
+
+        <div class="right-side">
+
+            <!-- REMINDER FORM -->
+
+            <div class="reminder-card">
+
+                <h3 class="section-title">
+
+                    Add Reminder
+
+                </h3>
+
+                <form method="POST">
+
+                    {% csrf_token %}
+
+                    <input
+        type="hidden"
+        name="form_type"
+        value="reminder_form"
+    >
+
+                    <div class="input-box">
+
+                        <label>
+
+                            Reminder Date
+
+                        </label>
+
+                        <input
+                            type="date"
+                            name="reminder_date"
+                            class="custom-input"
                         >
 
-                            {{ s.lead_status_name }}
+                    </div>
 
-                        </option>
+                    <br>
 
-                        {% endfor %}
+                    <div class="input-box">
 
-                    </select>
+                        <label>
 
-                </div>
+                            Reminder Time
 
-                <!-- NOTES -->
+                        </label>
 
-                <div class="input-box full-width">
+                        <input
+                            type="time"
+                            name="reminder_time"
+                            class="custom-input"
+                        >
 
-                    <label>
+                    </div>
 
-                        Notes
+                    <br>
 
-                    </label>
+                    <div class="input-box">
 
-                    <textarea
-                        name="notes"
-                        placeholder="Write notes..."
-                        class="custom-textarea"
-                    ></textarea>
+                        <label>
 
-                </div>
+                            Reminder Note
 
-                <!-- BUTTON -->
+                        </label>
 
-                <div class="full-width">
+                        <textarea
+                            name="reminder_note"
+                            class="custom-textarea"
+                            placeholder="Write reminder..."
+                        ></textarea>
+
+                    </div>
+
+                    <br>
 
                     <button class="save-btn">
 
-                        Save Changes
+                        Add Reminder
 
                     </button>
+
+                </form>
+
+            </div>
+
+            <!-- REMINDER HISTORY -->
+
+            <div class="reminder-card">
+
+                <h3 class="section-title">
+
+                    Reminder History
+
+                </h3>
+
+                <div class="reminder-history">
+
+                    {% for r in reminders %}
+
+                    <div class="reminder-item">
+
+                        <div class="reminder-top">
+
+                            <div class="reminder-date">
+
+                                {{ r.reminder_date }}
+
+                            </div>
+
+                            <div class="reminder-time">
+
+                                {{ r.reminder_time }}
+
+                            </div>
+
+                        </div>
+
+                        <div class="reminder-note">
+
+                            {{ r.reminder_note }}
+
+                        </div>
+
+                    </div>
+
+                    {% empty %}
+
+                    <div class="empty-history">
+
+                        No Reminders Found
+
+                    </div>
+
+                    {% endfor %}
 
                 </div>
 
             </div>
 
-        </form>
-
-        {% endif %}
-
-        <!-- ACTION BUTTONS -->
-
-        <div class="action-buttons">
-
-            <a
-                href="/delete-lead/{{ lead.id }}/"
-                class="btn delete-btn"
-                onclick="deleteLead(event, this.href)"
-            >
-
-                Delete Lead
-
-            </a>
-
-        </div>
-
-    </div>
-<!-- HISTORY SECTION -->
-
-<h3 class="section-title input-title">
-
-    Lead History
-
-</h3>
-
-<div class="history-container">
-
-    {% for h in history %}
-
-    <div class="history-card">
-
-        <div class="history-top">
-
-            <div class="history-status">
-
-                {{ h.status.lead_status_name }}
-
-            </div>
-
-            <div class="history-date">
-
-                {{ h.created_at|date:"d M Y h:i A" }}
-
-            </div>
-
-        </div>
-
-        <div class="history-body">
-
-            <div class="history-item">
-
-                <span>
-
-                    Updated By:
-
-                </span>
-
-                {{ h.updated_by.employee_name }}
-
-            </div>
-
-            {% if h.expected_date %}
-
-            <div class="history-item">
-
-                <span>
-
-                    Expected Closing:
-
-                </span>
-
-                {{ h.expected_date }}
-
-            </div>
-
-            {% endif %}
-
-            {% if h.notes %}
-
-            <div class="history-notes">
-
-                {{ h.notes }}
-
-            </div>
-
-            {% endif %}
-
         </div>
 
     </div>
 
-    {% empty %}
-
-    <div class="empty-history">
-
-        No History Found
-
-    </div>
-
-    {% endfor %}
-
-</div>
 </div>
 
 <script>
