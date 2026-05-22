@@ -4,7 +4,9 @@ from accounts.models import *
 from django.contrib import messages
 from django.db.models import Q
 from datetime import date, timedelta
+from accounts.permission import permission_required, has_permission
 # Create your views here.
+@permission_required('companies','can_add')
 def add_company(request):
     if request.method=="POST":
         company_name =  request.POST.get("company_name")
@@ -39,16 +41,24 @@ def add_company(request):
     context={
         'companies':companies,
         'role':role,
+        'can_view_company': has_permission(request,'companies','can_view'),
+    'can_view_employee' : has_permission(request,'employees','can_view'),
+    'can_view_lead'     : has_permission(request,'leads','can_view'),
+    'can_view_project'  : has_permission(request,'projects','can_view'),
+    'can_view_reminder' : has_permission(request,'reminders','can_view'),
     }
     return render(request,"company/add_company.html",context)
 
+@permission_required('companies','can_delete')
 def delete_company(request,id):
     company=UserInfo.objects.get(id=id)
     company.user.delete()
     return redirect('company_details')
 
+@permission_required('companies','can_edit')
 def edit_company(request,id):
     company=UserInfo.objects.get(id=id)
+    role = Users.objects.get(user=request.user).role
     if request.method =="POST":
         company.company_name =  request.POST.get("company_name")
         company.address      =  request.POST.get("address")
@@ -71,8 +81,18 @@ def edit_company(request,id):
         company.user.save()
         company.save()
         return redirect('company_details')
-    return render(request,'company/edit.html',{'company':company})
+    context = {
+        'role' : role,
+        'company':company,
+        'can_view_company': has_permission(request,'companies','can_view'),
+        'can_view_employee' : has_permission(request,'employees','can_view'),
+        'can_view_lead'     : has_permission(request,'leads','can_view'),
+        'can_view_project'  : has_permission(request,'projects','can_view'),
+        'can_view_reminder' : has_permission(request,'reminders','can_view'),
+    }
+    return render(request,'company/edit.html',context)
 
+@permission_required('companies','can_view')
 def company_details(request):
     companies = UserInfo.objects.filter(user__users__role="company")
     role = Users.objects.get(user=request.user).role
@@ -87,9 +107,18 @@ def company_details(request):
     context={
         'companies':companies,
         'role':role,
+        'can_add_company'   : has_permission(request,'companies','can_add'),
+        'can_edit_company'  : has_permission(request,'companies','can_edit'),
+        'can_delete_company': has_permission(request,'companies','can_delete'),
+        'can_view_company'  : has_permission(request,'companies','can_view'),
+        'can_view_employee' : has_permission(request,'employees','can_view'),
+        'can_view_lead'     : has_permission(request,'leads','can_view'),
+        'can_view_project'  : has_permission(request,'projects','can_view'),
+        'can_view_reminder' : has_permission(request,'reminders','can_view'),
     }
     return render(request,'company/details.html',context)
 
+@permission_required('leads','can_view')
 def leads(request):
     role = Users.objects.get(user=request.user).role
     employees = EmployeeInfo.objects.all()
@@ -105,9 +134,22 @@ def leads(request):
         'role':role,
         'employees':employees,
         'leads':leads,
+        'can_add_lead': has_permission(request,'leads','can_add'),
+        'can_edit_lead': has_permission(request,'leads','can_edit'),
+        'can_delete_lead': has_permission(request,'leads','can_delete'),
+        'can_view_company': has_permission(request,'companies','can_view'),
+        'can_view_employee' : has_permission(request,'employees','can_view'),
+        'can_view_lead'     : has_permission(request,'leads','can_view'),
+        'can_view_project'  : has_permission(request,'projects','can_view'),
+        'can_view_reminder' : has_permission(request,'reminders','can_view'),
     }
     return render(request,"leads/leads.html",context)
 
+def no_access(request):
+    role = Users.objects.get(user=request.user).role
+    return render(request,"no_access.html",{'role':role})
+
+@permission_required('leads','can_add')
 def add_leads(request):
     company = UserInfo.objects.filter(user=request.user).first()
     role = Users.objects.get(user=request.user).role
@@ -149,9 +191,15 @@ def add_leads(request):
         'types':types,
         'sources':sources,
         'statuses':statuses,
+        'can_view_company': has_permission(request,'companies','can_view'),
+    'can_view_employee' : has_permission(request,'employees','can_view'),
+    'can_view_lead'     : has_permission(request,'leads','can_view'),
+    'can_view_project'  : has_permission(request,'projects','can_view'),
+    'can_view_reminder' : has_permission(request,'reminders','can_view'),
     }
     return render(request,"leads/add_leads.html",context)
 
+@permission_required('leads','can_delete')
 def delete_lead(request,id):
     Leads.objects.get(id=id).delete()
     messages.success(request,"Lead deleted successfully")
@@ -163,6 +211,11 @@ def lead_source(request):
     context={
         'role':role,
         'sources':sources,
+        'can_view_company': has_permission(request,'companies','can_view'),
+    'can_view_employee' : has_permission(request,'employees','can_view'),
+    'can_view_lead'     : has_permission(request,'leads','can_view'),
+    'can_view_project'  : has_permission(request,'projects','can_view'),
+    'can_view_reminder' : has_permission(request,'reminders','can_view'),
     }
     return render(request,"leads/lead_source.html",context)
 
@@ -179,6 +232,11 @@ def add_lead_source(request):
         return redirect('lead_source')
     context ={
         'role':role,
+        'can_view_company': has_permission(request,'companies','can_view'),
+    'can_view_employee' : has_permission(request,'employees','can_view'),
+    'can_view_lead'     : has_permission(request,'leads','can_view'),
+    'can_view_project'  : has_permission(request,'projects','can_view'),
+    'can_view_reminder' : has_permission(request,'reminders','can_view'),
     }
     return render(request,"leads/add_lead_source.html",context)
 
@@ -206,6 +264,11 @@ def for_type(request):
     context={
         'role':role,
         'types':types,
+        'can_view_company': has_permission(request,'companies','can_view'),
+    'can_view_employee' : has_permission(request,'employees','can_view'),
+    'can_view_lead'     : has_permission(request,'leads','can_view'),
+    'can_view_project'  : has_permission(request,'projects','can_view'),
+    'can_view_reminder' : has_permission(request,'reminders','can_view'),
     }
     return render(request,"leads/for_type.html",context)
 
@@ -221,7 +284,12 @@ def add_for_type(request):
         messages.success(request,"Lead Type added")
         return redirect('for_type')
     context={
-        'role':role
+        'role':role,
+        'can_view_company': has_permission(request,'companies','can_view'),
+    'can_view_employee' : has_permission(request,'employees','can_view'),
+    'can_view_lead'     : has_permission(request,'leads','can_view'),
+    'can_view_project'  : has_permission(request,'projects','can_view'),
+    'can_view_reminder' : has_permission(request,'reminders','can_view'),
     }
     return render(request,'leads/add_for_type.html',context)
 
@@ -292,6 +360,11 @@ def lead_details(request,lead_id):
         'status'   :status,
         'history'  :history,
         'reminders':reminders,
+        'can_view_company': has_permission(request,'companies','can_view'),
+    'can_view_employee' : has_permission(request,'employees','can_view'),
+    'can_view_lead'     : has_permission(request,'leads','can_view'),
+    'can_view_project'  : has_permission(request,'projects','can_view'),
+    'can_view_reminder' : has_permission(request,'reminders','can_view'),
     }
     return render(request,"leads/lead_details.html",context)
 
@@ -303,6 +376,11 @@ def lead_status(request):
     context = {
         'role'     : role,
         'statuses' : statuses,
+        'can_view_company': has_permission(request,'companies','can_view'),
+    'can_view_employee' : has_permission(request,'employees','can_view'),
+    'can_view_lead'     : has_permission(request,'leads','can_view'),
+    'can_view_project'  : has_permission(request,'projects','can_view'),
+    'can_view_reminder' : has_permission(request,'reminders','can_view'),
     }
     return render(request,"leads/lead_status.html",context)
 
@@ -324,6 +402,11 @@ def add_lead_status(request):
     
     context = {
         'role':role,
+        'can_view_company': has_permission(request,'companies','can_view'),
+    'can_view_employee' : has_permission(request,'employees','can_view'),
+    'can_view_lead'     : has_permission(request,'leads','can_view'),
+    'can_view_project'  : has_permission(request,'projects','can_view'),
+    'can_view_reminder' : has_permission(request,'reminders','can_view'),
     }
     return render(request,"leads/add_lead_status.html",context)
 
@@ -352,6 +435,7 @@ def active_lead_status(request, id):
 
     return redirect('lead_status')
 
+@permission_required('reminders','can_view')
 def reminders(request):
     role = Users.objects.get(user=request.user).role
     company = UserInfo.objects.filter(user=request.user).first()
@@ -360,6 +444,11 @@ def reminders(request):
         'role':role,
         'reminders':reminders,
         'title': 'All Reminders',
+        'can_view_company': has_permission(request,'companies','can_view'),
+    'can_view_employee' : has_permission(request,'employees','can_view'),
+    'can_view_lead'     : has_permission(request,'leads','can_view'),
+    'can_view_project'  : has_permission(request,'projects','can_view'),
+    'can_view_reminder' : has_permission(request,'reminders','can_view'),
     }
     return render(request,'leads/all_reminder.html',context)
 
@@ -373,14 +462,15 @@ def complete_reminder(request, id):
     return redirect('reminders')
 
 # DELETE REMINDER
-
+@permission_required('leads','can_delete')
 def delete_reminder(request, id):
     reminder = Reminder.objects.filter(id=id).first()
     reminder.is_deleted = True
     reminder.save()
     messages.success(request,"Reminder Deleted Successfully")
     return redirect('reminders')
-    
+
+@permission_required('reminders','can_view')
 def today_reminders(request):
     role = Users.objects.get(user=request.user).role
     today = date.today()
@@ -389,9 +479,15 @@ def today_reminders(request):
         'role':role,
         'title': "Today's Reminders",
         'reminders': reminders,
+        'can_view_company': has_permission(request,'companies','can_view'),
+    'can_view_employee' : has_permission(request,'employees','can_view'),
+    'can_view_lead'     : has_permission(request,'leads','can_view'),
+    'can_view_project'  : has_permission(request,'projects','can_view'),
+    'can_view_reminder' : has_permission(request,'reminders','can_view'),
     }
     return render(request,"leads/all_reminder.html",context)
 
+@permission_required('reminders','can_view')
 def tomorrow_reminders(request):
     role = Users.objects.get(user=request.user).role
     tomorrow = date.today() + timedelta(days=1)
@@ -403,6 +499,11 @@ def tomorrow_reminders(request):
         'role':role,
         'title': "Tomorrow Reminders",
         'reminders': reminders,
+        'can_view_company': has_permission(request,'companies','can_view'),
+    'can_view_employee' : has_permission(request,'employees','can_view'),
+    'can_view_lead'     : has_permission(request,'leads','can_view'),
+    'can_view_project'  : has_permission(request,'projects','can_view'),
+    'can_view_reminder' : has_permission(request,'reminders','can_view'),
     }
     return render(
         request,

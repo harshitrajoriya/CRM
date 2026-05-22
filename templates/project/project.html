@@ -181,7 +181,7 @@ td{
     <div class="top-bar">
 
         <h2>Projects</h2>
-        {%if role == "company"%}
+        {%if can_add_project%}
         <a href="/add-project/" class="btn">
 
             Add Project
@@ -282,12 +282,15 @@ td{
 
                         <td>
 
+                            {%if can_edit_project%}
                             <a href="/edit-project/{{ p.project_id }}/" class="action-btn">
 
                                 Edit
 
                             </a>
+                            {%endif%}
 
+                            {% if can_delete_project%}
                             <a
     href="/delete-project/{{ p.project_id }}/"
     class="delete-btn"
@@ -295,11 +298,14 @@ td{
 >
     Delete
 </a>
+{%endif%}
 
                         </td>
+                        {% if can_view_project %}
                         <td>
 
-    <a
+ 
+                        <a
         href="/project-details/{{ p.project_id }}/"
         class="view-btn"
     >
@@ -309,6 +315,7 @@ td{
     </a>
 
 </td>
+{%endif%}
 
                     </tr>
 

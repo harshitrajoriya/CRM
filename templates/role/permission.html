@@ -1,0 +1,584 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+.container{
+    width:100%;
+}
+
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.card{
+    background:#13161d;
+    border:1px solid #222;
+    border-radius:14px;
+    padding:20px;
+}
+
+.table-wrap{
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    text-align:left;
+    padding:14px;
+    color:#9ca3af;
+    border-bottom:1px solid #222;
+}
+
+td{
+    padding:16px 14px;
+    border-bottom:1px solid #222;
+    color:white;
+}
+
+.role-badge{
+
+    padding:7px 14px;
+
+    border-radius:20px;
+
+    font-size:12px;
+
+    font-weight:600;
+}
+
+.admin{
+    background:rgba(79,124,255,.15);
+    color:#4f7cff;
+}
+
+.company{
+    background:rgba(34,197,94,.15);
+    color:#22c55e;
+}
+
+.employee{
+    background:rgba(245,158,11,.15);
+    color:#f59e0b;
+}
+
+.switch {
+
+    position: relative;
+
+    display: inline-block;
+
+    width: 48px;
+
+    height: 24px;
+}
+
+.switch input {
+
+    opacity: 0;
+
+    width: 0;
+
+    height: 0;
+}
+
+.slider {
+
+    position: absolute;
+
+    cursor: pointer;
+
+    top: 0;
+
+    left: 0;
+
+    right: 0;
+
+    bottom: 0;
+
+    background-color: #2a2f3a;
+
+    transition: .3s;
+
+    border-radius: 30px;
+}
+
+.slider:before {
+
+    position: absolute;
+
+    content: "";
+
+    height: 18px;
+
+    width: 18px;
+
+    left: 3px;
+
+    bottom: 3px;
+
+    background-color: white;
+
+    transition: .3s;
+
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+
+    background-color: #4f7cff;
+}
+
+input:checked + .slider:before {
+
+    transform: translateX(24px);
+}
+
+.save-btn{
+
+    background:#4f7cff;
+
+    border:none;
+
+    padding:10px 16px;
+
+    border-radius:8px;
+
+    color:white;
+
+    cursor:pointer;
+}
+
+.save-btn:hover{
+
+    background:#3d68e0;
+}
+
+.role-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    background:#111827;
+
+    padding:18px 20px;
+
+    border-radius:12px;
+
+    margin-bottom:12px;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.role-header:hover{
+
+    background:#1a2233;
+}
+
+.role-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+}
+
+.arrow{
+
+    color:#9ca3af;
+
+    transition:.3s;
+}
+
+.role-count{
+
+    color:#9ca3af;
+
+    font-size:13px;
+}
+
+.role-body{
+
+    display:none;
+
+    padding:0 0 20px 0;
+}
+
+.permission-row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    background:#13161d;
+
+    border:1px solid #222;
+
+    border-radius:12px;
+
+    padding:18px;
+
+    margin-bottom:12px;
+}
+
+.module-name{
+
+    width:180px;
+
+    font-size:15px;
+
+    font-weight:500;
+
+    text-transform:capitalize;
+}
+
+.toggle-group{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:35px;
+}
+
+.toggle-box{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    gap:10px;
+}
+
+.toggle-label{
+
+    font-size:12px;
+
+    color:#9ca3af;
+}
+</style>
+
+<div class="container">
+{% if messages %}
+
+    {% for message in messages %}
+
+        <script>
+
+            Swal.fire({
+
+                title: 'Success',
+
+                text: '{{ message }}',
+
+                icon: 'success',
+
+                background:'#13161d',
+
+                color:'white',
+
+                confirmButtonColor:'#4f7cff'
+            })
+
+        </script>
+
+    {% endfor %}
+
+{% endif %}
+    <div class="page-header">
+
+        <h2>
+
+            Permissions Management
+
+        </h2>
+
+    </div>
+
+    <div class="card">
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Role</th>
+
+                        <th>Module</th>
+
+                        <th>View</th>
+
+                        <th>Add</th>
+
+                        <th>Edit</th>
+
+                        <th>Delete</th>
+
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+{% regroup permissions by role as role_permissions %}
+
+{% for role_group in role_permissions %}
+
+<tr>
+
+    <td colspan="7" style="padding:0; border:none;">
+
+        <!-- ROLE HEADER -->
+
+        <div
+            class="role-header"
+            onclick="toggleRole('{{ role_group.grouper }}')"
+        >
+
+            <div class="role-left">
+
+                <span class="arrow" id="arrow-{{ role_group.grouper }}">
+
+                    ▶
+
+                </span>
+
+                <span class="role-badge {{ role_group.grouper }}">
+
+                    {{ role_group.grouper }}
+
+                </span>
+
+            </div>
+
+            <div class="role-count">
+
+                {{ role_group.list|length }} Modules
+
+            </div>
+
+        </div>
+
+        <!-- ROLE BODY -->
+
+        <div
+            class="role-body"
+            id="role-{{ role_group.grouper }}"
+        >
+
+            {% for p in role_group.list %}
+
+            <form
+                method="POST"
+                action="/update-permission/{{ p.id }}/"
+                class="permission-row"
+            >
+
+                {% csrf_token %}
+
+                <!-- MODULE -->
+
+                <div class="module-name">
+
+                    {{ p.module }}
+
+                </div>
+
+                <!-- TOGGLES -->
+
+                <div class="toggle-group">
+
+                    <!-- VIEW -->
+
+                    <div class="toggle-box">
+
+                        <div class="toggle-label">
+
+                            View
+
+                        </div>
+
+                        <label class="switch">
+
+                            <input
+                                type="checkbox"
+                                name="can_view"
+
+                                {% if p.can_view %}
+                                checked
+                                {% endif %}
+                            >
+
+                            <span class="slider"></span>
+
+                        </label>
+
+                    </div>
+
+                    <!-- ADD -->
+
+                    <div class="toggle-box">
+
+                        <div class="toggle-label">
+
+                            Add
+
+                        </div>
+
+                        <label class="switch">
+
+                            <input
+                                type="checkbox"
+                                name="can_add"
+
+                                {% if p.can_add %}
+                                checked
+                                {% endif %}
+                            >
+
+                            <span class="slider"></span>
+
+                        </label>
+
+                    </div>
+
+                    <!-- EDIT -->
+
+                    <div class="toggle-box">
+
+                        <div class="toggle-label">
+
+                            Edit
+
+                        </div>
+
+                        <label class="switch">
+
+                            <input
+                                type="checkbox"
+                                name="can_edit"
+
+                                {% if p.can_edit %}
+                                checked
+                                {% endif %}
+                            >
+
+                            <span class="slider"></span>
+
+                        </label>
+
+                    </div>
+
+                    <!-- DELETE -->
+
+                    <div class="toggle-box">
+
+                        <div class="toggle-label">
+
+                            Delete
+
+                        </div>
+
+                        <label class="switch">
+
+                            <input
+                                type="checkbox"
+                                name="can_delete"
+
+                                {% if p.can_delete %}
+                                checked
+                                {% endif %}
+                            >
+
+                            <span class="slider"></span>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+                <!-- SAVE -->
+
+                <button class="save-btn">
+
+                    Save
+
+                </button>
+
+            </form>
+
+            {% endfor %}
+
+        </div>
+
+    </td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+
+function toggleRole(role){
+
+    const body = document.getElementById(
+
+        `role-${role}`
+    )
+
+    const arrow = document.getElementById(
+
+        `arrow-${role}`
+    )
+
+    if(body.style.display === "block"){
+
+        body.style.display = "none"
+
+        arrow.innerHTML = "▶"
+
+    }
+
+    else{
+
+        body.style.display = "block"
+
+        arrow.innerHTML = "▼"
+    }
+}
+
+</script>
+{% endblock %}

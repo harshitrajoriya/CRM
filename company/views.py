@@ -3,7 +3,9 @@ from django.contrib.auth.models import User
 from accounts.models import Users, EmployeeInfo, UserInfo, Project
 from django.contrib import messages
 from django.db.models import Q
+from accounts.permission import permission_required, has_permission
 # Create your views here.
+@permission_required('employees','can_add')
 def add_employee(request):
     company=UserInfo.objects.get(user=request.user)
     employees = EmployeeInfo.objects.filter(company=company)
@@ -47,15 +49,24 @@ def add_employee(request):
     context={
     'employees':employees,
     'role':role,
+    'can_view_company': has_permission(request,'companies','can_view'),
+    'can_view_employee' : has_permission(request,'employees','can_view'),
+    'can_view_lead'     : has_permission(request,'leads','can_view'),
+    'can_view_project'  : has_permission(request,'projects','can_view'),
+    'can_view_reminder' : has_permission(request,'reminders','can_view'),
+
 }
     return render(request,"employee/add_employee.html",context)
 
+@permission_required('employees','can_delete')
 def delete_employee(request,id):
     employee=EmployeeInfo.objects.get(id=id)
     employee.user.delete()
     return redirect('employee_details')
 
+@permission_required('employees','can_edit')
 def edit_employee(request, id):
+    role = Users.objects.get(user=request.user).role
     employee = EmployeeInfo.objects.get(id=id)
 
     if request.method == "POST":
@@ -89,9 +100,18 @@ def edit_employee(request, id):
         employee.save()
 
         return redirect('employee_details')
-    
-    return render(request, "employee/edit.html", {'employee': employee})
+    context = {
+        'role':role,
+        'employee':employee,
+    'can_view_company': has_permission(request,'companies','can_view'),
+    'can_view_employee' : has_permission(request,'employees','can_view'),
+    'can_view_lead'     : has_permission(request,'leads','can_view'),
+    'can_view_project'  : has_permission(request,'projects','can_view'),
+    'can_view_reminder' : has_permission(request,'reminders','can_view'),
+    }
+    return render(request, "employee/edit.html",context)
 
+@permission_required('employees','can_view')
 def employee_details(request):
     role = Users.objects.get(user=request.user).role
     
@@ -115,18 +135,37 @@ def employee_details(request):
     'employees':employees,
     'role':role,
     'employees': employees,
+    
+    'can_add_employee':has_permission(request,'employees','can_add'),
+    'can_edit_employee':has_permission(request,'employees','can_edit'),
+    'can_delete_employee':has_permission(request,'employees','can_delete'),
+    'can_view_company': has_permission(request,'companies','can_view'),
+    'can_view_employee' : has_permission(request,'employees','can_view'),
+    'can_view_lead'     : has_permission(request,'leads','can_view'),
+    'can_view_project'  : has_permission(request,'projects','can_view'),
+    'can_view_reminder' : has_permission(request,'reminders','can_view'),
     }
     return render(request,'employee/details.html',context)
 
+@permission_required('projects','can_view')
 def project(request):
     role=Users.objects.get(user=request.user).role
     projects=Project.objects.all()
     context = {
         'role':role,
         'projects':projects,
+        'can_edit_project':has_permission(request,'projects','can_edit'),
+        'can_delete_project':has_permission(request,'projects','can_delete'),
+        'can_add_project':has_permission(request,'projects','can_add'),
+    'can_view_company': has_permission(request,'companies','can_view'),
+    'can_view_employee' : has_permission(request,'employees','can_view'),
+    'can_view_lead'     : has_permission(request,'leads','can_view'),
+    'can_view_project'  : has_permission(request,'projects','can_view'),
+    'can_view_reminder' : has_permission(request,'reminders','can_view'),
     }
     return render(request,"project/project.html",context)
 
+@permission_required('projects','can_add')
 def add_project(request):
     role = Users.objects.get(user=request.user).role
     employees=EmployeeInfo.objects.all()
@@ -157,14 +196,21 @@ def add_project(request):
     context = {
         'employees':employees,
         'role':role,
+        'can_view_company': has_permission(request,'companies','can_view'),
+    'can_view_employee' : has_permission(request,'employees','can_view'),
+    'can_view_lead'     : has_permission(request,'leads','can_view'),
+    'can_view_project'  : has_permission(request,'projects','can_view'),
+    'can_view_reminder' : has_permission(request,'reminders','can_view'),
     }
     return render(request,"project/add_project.html",context)
 
+@permission_required('projects','can_delete')
 def delete_project(request,project_id):
     Project.objects.get(project_id = project_id).delete()
     messages.success(request,"project deleted")
     return redirect('project')
 
+@permission_required('projects','can_edit')
 def edit_project(request,project_id):
     role = Users.objects.get(user=request.user).role
     project=Project.objects.filter(project_id=project_id).first()
@@ -185,14 +231,25 @@ def edit_project(request,project_id):
         'project':project,
         'employees':employees,
         'role':role,
+        'can_view_company': has_permission(request,'companies','can_view'),
+    'can_view_employee' : has_permission(request,'employees','can_view'),
+    'can_view_lead'     : has_permission(request,'leads','can_view'),
+    'can_view_project'  : has_permission(request,'projects','can_view'),
+    'can_view_reminder' : has_permission(request,'reminders','can_view'),
     }
     return render(request,"project/edit_project.html",context)
 
+@permission_required('projects','can_view')
 def project_details(request,project_id):
     role = Users.objects.get(user=request.user).role
     project = Project.objects.filter(project_id=project_id).first()
     context={
         'role' : role,
         'project': project,
+        'can_view_company': has_permission(request,'companies','can_view'),
+    'can_view_employee' : has_permission(request,'employees','can_view'),
+    'can_view_lead'     : has_permission(request,'leads','can_view'),
+    'can_view_project'  : has_permission(request,'projects','can_view'),
+    'can_view_reminder' : has_permission(request,'reminders','can_view'),
     }
     return render(request,"project/project_details.html",context)

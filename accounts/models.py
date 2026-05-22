@@ -129,3 +129,53 @@ class Reminder(models.Model):
     created_at    = models.DateTimeField(auto_now_add=True)
     is_completed  = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
+    
+class Permission(models.Model):
+
+    ROLE_CHOICES = [
+        ('admin','Admin'),
+        ('superadmin','Super Admin'),
+        ('company','Company'),
+        ('employee','Employee'),
+    ]
+
+    MODULE_CHOICES = [
+        ('dashboard','Dashboard'),
+        ('leads','Leads'),
+        ('projects','Projects'),
+        ('reminders','Reminders'),
+        ('employees','Employees'),
+        ('companies','Companies'),
+        ('settings','Settings'),
+        ('permissions','Permissions'),
+    ]
+
+    role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES
+    )
+
+    module = models.CharField(
+        max_length=50,
+        choices=MODULE_CHOICES
+    )
+
+    can_view = models.BooleanField(
+        default=False
+    )
+
+    can_add = models.BooleanField(
+        default=False
+    )
+
+    can_edit = models.BooleanField(
+        default=False
+    )
+
+    can_delete = models.BooleanField(
+        default=False
+    )
+
+    def __str__(self):
+
+        return f"{self.role} - {self.module}"

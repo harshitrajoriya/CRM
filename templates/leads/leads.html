@@ -285,10 +285,12 @@ tr:hover{
 </div>
     <div class="page-header">
         <h2>|  Leads</h2>
-    </div>{%if role == "company"%}
+    </div>
+    {%if can_add_lead%}
     <a href="/add-leads/">
         <button class="btn">Add leads</button>
-    </a>   {%endif%}
+    </a>   
+    {%endif%}
     <br>
    <div class="search-box">
     <form method="GET">
@@ -339,28 +341,10 @@ tr:hover{
                     <td>{{ lead.lead_source.lead_source_name }}</td>
                     <td>{{ lead.for_type.for_type_name }}</td>
                     <td>
-
-                        {% comment %} {% if lead.status == "new" %} {% endcomment %}
+                        
                         <span class="status-badge pending">
                             {{lead.status.lead_status_name}}
                         </span>
-
-                        {% comment %} {% elif lead.status == "converted" %}
-                        <span class="status-badge active">
-                            Converted
-                        </span>
-
-                        {% elif lead.status == "closed" %}
-                        <span class="status-badge inactive">
-                            Closed
-                        </span>
-
-                        {% else %}
-                        <span class="status-badge">
-                            {{ lead.status }}
-                        </span>
-                        {% endif %} {% endcomment %}
-
                     </td>
 
                     <td>
@@ -368,16 +352,12 @@ tr:hover{
                     </td>
 
                     <td class="action">
-
-    <a
+        {% if can_edit_lead %}
+        <a
         href="/leads-details/{{ lead.leadid }}/"
-        class="view-btn"
-    >
-
-        View
-
-    </a>
-
+        class="view-btn">View</a>
+        {% endif %}
+    {% if can_delete_lead%}
     <a
         href="/delete-lead/{{ lead.id }}"
         onclick="deleteLead(event, this.href)"
@@ -387,6 +367,7 @@ tr:hover{
         Delete
 
     </a>
+    {%endif%}
 
 </td>
 

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+.no-access-container{
+
+    width:100%;
+
+    height:80vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+}
+
+.no-access-card{
+
+    background:#13161d;
+
+    border:1px solid #222;
+
+    border-radius:16px;
+
+    padding:40px;
+
+    width:400px;
+
+    text-align:center;
+}
+
+.back-btn{
+
+    background:#4f7cff;
+
+    color:white;
+
+    padding:12px 20px;
+
+    border-radius:10px;
+
+    text-decoration:none;
+
+    display:inline-block;
+
+    margin-top:20px;
+}
+
+</style>
+
+<div class="no-access-container">
+
+    <div class="no-access-card">
+
+        <h2>
+
+            Access Denied
+
+        </h2>
+
+        <p>
+
+            You do not have permission
+            to access this page.
+
+        </p>
+
+        <a
+            href="/dashboard/"
+            class="back-btn"
+        >
+
+            Back
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

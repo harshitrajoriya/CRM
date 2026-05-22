@@ -611,7 +611,7 @@ a:hover {
     </div>
  
     <div class="nav-label">Management</div>
-    {% if role == "admin" %}
+    {% if can_view_company %}
 
     <a href="/company-details/">
     <div class="nav-item {% if 'company' in request.path %}active{% endif %}">
@@ -626,7 +626,7 @@ a:hover {
     </div>
     </a>
     {%endif%}
-    {% if role == "company" or role == "admin"%}
+    {% if can_view_employee %}
     <a href="/employee-details/">
     <div class="nav-item {% if 'employee' in request.path %}active{% endif %}">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -648,16 +648,18 @@ a:hover {
 
     <div class="nav-item lead-toggle" onclick="toggleLeadMenu()">
 
-        <div class="lead-left">
+        {% if can_view_lead %}
+      <div class="lead-left">
 
             <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
                 <rect x="2" y="3" width="12" height="10" rx="1.5"/>
                 <path d="M5 7h6M5 10h4"/>
-            </svg>
+            </svg> 
 
             <span>Leads</span>
 
         </div>
+        {%endif%}
 
         <svg
             class="dropdown-arrow"
@@ -677,7 +679,8 @@ a:hover {
 
     <div class="nav-dropdown">
 
-        <a
+        {% if can_view_lead %}
+      <a
             href="/leads/"
             class="{% if 'leads' in request.path %}dropdown-active{% endif %}"
         >
@@ -704,7 +707,9 @@ a:hover {
         >
             Status
         </a>
+        {% endif %}
 
+        {% if can_view_reminder %}
         <a href="/reminders/"
         class="{% if 'reminder' in request.path %}dropdown-active{% endif %}">
           
@@ -712,10 +717,12 @@ a:hover {
         Reminders
 
       </a>
+      {%endif%}
 
     </div>
 
 </div>
+{% if can_view_project%}
 <a href = "/project/">
     <div class="nav-item {% if 'project' in request.path %}active{% endif %}">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -724,6 +731,7 @@ a:hover {
       Projects
     </div>
   </a>
+  {% endif %}
     <div class="nav-label">System</div>
     <div class="nav-item">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -731,12 +739,14 @@ a:hover {
       </svg>
       Settings
     </div>
-    <div class="nav-item">
+    <a href = "/permission/">
+    <div class="nav-item {% if 'permission' in request.path %}active{% endif %}">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
         <path d="M8 1l1.8 3.6L14 5.5l-3 2.9.7 4.1L8 10.4l-3.7 2.1.7-4.1L2 5.5l4.2-.9z"/>
       </svg>
       Roles & Permissions
     </div>
+  </a>
     <div class="nav-item">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
         <path d="M8 2a2 2 0 0 1 2 2 4 4 0 0 1 2.7 5.2L11 12H5l-1.7-2.8A4 4 0 0 1 6 4a2 2 0 0 1 2-2z"/>

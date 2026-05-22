@@ -138,11 +138,12 @@ tr:hover {
 {{message}}
 {%endfor%}
 {%endif%}
-{% if role == "admin" %}
+{% if can_add_company %}
 <a href="/add-company/">
 <button class="btn">Add Company</button>
 </a>
-{%endif%}
+{% endif %}
+
 <br>
 <!-- TABLE -->
 <div class="card">
@@ -166,8 +167,8 @@ tr:hover {
     <td>{{ c.gst }}</td>
 
     <td class="action">
-        <a href="/edit-company/{{c.id}}">Edit</a>
-        <a href="/delete-company/{{c.id}}">Delete</a>
+        {% if can_edit_company %}<a href="/edit-company/{{c.id}}">Edit</a>{%endif%}
+        {% if can_delete_company %}<a href="/delete-company/{{c.id}}">Delete</a>{%endif%}
     </td>
 </tr>
 {% endfor %}

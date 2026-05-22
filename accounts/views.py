@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from accounts.models import Users, UserInfo, EmployeeInfo
+from accounts.permission import has_permission, permission_required
 # Create your views here.
 def login_view(request):
     if request.method == "POST":
@@ -46,7 +47,13 @@ def dashboard(request):
         'company'  : company,
         
         'companies_count':companies_count,
-        'employees_count':employees_count
+        'employees_count':employees_count,
+        
+        'can_view_company': has_permission(request,'companies','can_view'),
+        'can_view_employee' : has_permission(request,'employees','can_view'),
+        'can_view_lead'     : has_permission(request,'leads','can_view'),
+        'can_view_project'  : has_permission(request,'projects','can_view'),
+        'can_view_reminder' : has_permission(request,'reminders','can_view'),
     }
     return render(request,"dashboard.html",context)
 

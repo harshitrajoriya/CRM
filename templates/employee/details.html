@@ -144,7 +144,7 @@ tr:hover {
 {{message}}
 {%endfor%}
 {%endif%}
-{% if role == "company" %}
+{%if can_add_employee%}
 <a href="/add-employee/">
 <button class="btn">Add Employee</button>
 </a>
@@ -175,8 +175,8 @@ tr:hover {
     <td>{{ e.employee_name }}</td>
     <td>{{ e.user.users_set.first.phone }}</td>
     <td class="action">
-        <a href="/edit-employee/{{e.id}}">Edit</a>
-        <a href="/delete-employee/{{e.id}}">Delete</a>
+        {% if can_edit_employee %}<a href="/edit-employee/{{e.id}}">Edit</a>{%endif%}
+        {% if can_delete_employee %}<a href="/delete-employee/{{e.id}}">Delete</a>{%endif%}
     </td>
 </tr>
 {% endfor %}
